@@ -516,7 +516,7 @@
         </div>
 
         <!-- Step 2: Unlocked Admin Dashboard (Mobile-Responsive) -->
-        <div id="admin-dashboard-screen" class="hidden flex-1 flex-col">
+        <div id="admin-dashboard-screen" class="hidden flex-1 flex flex-col">
             <!-- Admin Header -->
             <header class="bg-onyx border-b border-goldPrimary/25 py-3 px-3 sm:px-8 sticky top-0 z-40">
                 <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
@@ -1778,7 +1778,7 @@
         };
 
         // ==================== SEPARATE ROUTE HANDLER (#/admin-basex or ?panel=admin) ====================
-        window.isAdminRouteActive = function isAdminRouteActive() {
+        window.isAdminRouteActive = function() {
             const hash = (window.location.hash || '').toLowerCase().trim();
             const search = (window.location.search || '').toLowerCase();
             const params = new URLSearchParams(search);
@@ -1810,6 +1810,9 @@
                 return;
             }
             logoTapTimer = setTimeout(() => {
+                if (logoTapCount < 5) {
+                    switchPublicView('store');
+                }
                 logoTapCount = 0;
             }, 1500);
         };
@@ -1843,25 +1846,26 @@
             const dashScreen = document.getElementById('admin-dashboard-screen');
 
             if (isAdmin) {
-                publicShell.classList.add('hidden');
-                adminShell.classList.remove('hidden');
+                publicShell.style.display = 'none';
                 adminShell.style.display = 'flex';
+                adminShell.style.flexDirection = 'column';
+                adminShell.style.minHeight = '100vh';
+                adminShell.style.backgroundColor = '#070709';
                 const unlocked = sessionStorage.getItem(ADMIN_UNLOCK_KEY) === 'true';
                 if (unlocked) {
-                    gateScreen.classList.add('hidden');
                     gateScreen.style.display = 'none';
-                    dashScreen.classList.remove('hidden');
                     dashScreen.style.display = 'flex';
+                    dashScreen.style.flexDirection = 'column';
+                    dashScreen.style.flex = '1';
                 } else {
-                    gateScreen.classList.remove('hidden');
                     gateScreen.style.display = 'flex';
-                    dashScreen.classList.add('hidden');
+                    gateScreen.style.flex = '1';
+                    gateScreen.style.alignItems = 'center';
+                    gateScreen.style.justifyContent = 'center';
                     dashScreen.style.display = 'none';
                 }
             } else {
-                adminShell.classList.add('hidden');
                 adminShell.style.display = 'none';
-                publicShell.classList.remove('hidden');
                 publicShell.style.display = '';
             }
 
@@ -1876,27 +1880,25 @@
             e.preventDefault();
             const inputEl = document.getElementById('admin-secret-input');
             const errEl = document.getElementById('admin-gate-error');
-            const submitBtn = e.target.querySelector('button[type="submit"]');
             const entered = (inputEl.value || '').trim().replace(/\s+/g, '').toUpperCase();
-            const customSecret = (window.state.settings.adminSecretCode || 'BASEX2026').trim().replace(/\s+/g, '').toUpperCase();
+            const customSecret = ((window.state && window.state.settings && window.state.settings.adminSecretCode) || 'BASEX2026').trim().replace(/\s+/g, '').toUpperCase();
 
-            // Accepts both custom configured secret and Master Fallback PIN
             if (entered === customSecret || entered === 'BASEX2026') {
                 sessionStorage.setItem(ADMIN_UNLOCK_KEY, 'true');
                 inputEl.value = '';
-                if (errEl) errEl.classList.add('hidden');
-                if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '✓'; }
-                setTimeout(() => window.initRoutingAndUI(), 120);
+                if (errEl) { errEl.style.display = 'none'; errEl.classList.add('hidden'); }
+                window.initRoutingAndUI();
             } else {
                 if (errEl) {
-                    errEl.textContent = typeof window.t === 'function' ? window.t('toast_wrong_secret') : 'Invalid Admin Secret Code!';
+                    errEl.textContent = typeof window.t === 'function' ? window.t('toast_wrong_secret') : 'رمز خاطئ / Invalid code!';
+                    errEl.style.display = 'block';
                     errEl.classList.remove('hidden');
                 }
                 inputEl.value = '';
                 inputEl.focus();
-                inputEl.classList.add('border-rose-500');
-                setTimeout(() => inputEl.classList.remove('border-rose-500'), 1200);
-                if (typeof window.showToast === 'function') window.showToast(typeof window.t === 'function' ? window.t('toast_wrong_secret') : 'Invalid code!', 'error');
+                inputEl.style.borderColor = '#f43f5e';
+                setTimeout(() => { inputEl.style.borderColor = ''; }, 1200);
+                if (typeof window.showToast === 'function') window.showToast('رمز خاطئ / Invalid code!', 'error');
             }
         };
 
@@ -2519,34 +2521,31 @@
             const dList = document.getElementById('adm-deposits-list');
             if (dList) {
                 dList.innerHTML = window.state.deposits.length === 0
-                    ? `<div class="luxury-card rounded-2xl p-6 text-center text-xs text-slate-500">لا توجد طلبات شحن بعد. / No deposit requests yet.</div>`
+                    ? '<div class="text-center text-xs text-slate-500 py-8">لا توجد طلبات شحن بعد.</div>'
                     : window.state.deposits.map(d => {
+                        const isPending = d.status === 'pending';
                         const badge = d.status === 'approved'
-                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">${window.t('status_approved')}</span>`
+                            ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">مقبول</span>'
                             : d.status === 'rejected'
-                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">${window.t('status_rejected')}</span>`
-                            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">${window.t('status_pending')}</span>`;
-                        return `
-                            <div class="luxury-card rounded-2xl p-4 space-y-2.5">
-                                <div class="flex flex-wrap items-center justify-between gap-2">
-                                    <div>
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            <span class="font-mono font-black text-sm text-goldLight">$${Number(d.amountUSD).toFixed(2)}</span>
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-goldPrimary/15 text-goldLight">${d.coin}</span>
-                                            ${badge}
-                                        </div>
-                                        <div class="text-xs font-mono text-slate-400 mt-1 truncate max-w-[260px]">TxID: ${d.txId}</div>
-                                        <div class="text-[10px] font-mono text-slate-500">${d.userEmail} · ${d.createdAt}</div>
-                                    </div>
-                                    ${d.status === 'pending' ? `
-                                        <div class="flex items-center gap-2 shrink-0">
-                                            <button onclick="approveOrRejectDeposit('${d.id}','approved')" class="min-h-[36px] px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 border border-emerald-500/30 text-xs font-bold">${window.t('btn_approve')}</button>
-                                            <button onclick="approveOrRejectDeposit('${d.id}','rejected')" class="min-h-[36px] px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-bold">${window.t('btn_reject')}</button>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        `;
+                            ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">مرفوض</span>'
+                            : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">معلق</span>';
+                        return '<div class="luxury-card rounded-2xl p-4 space-y-2">' +
+                            '<div class="flex flex-wrap items-start justify-between gap-2">' +
+                                '<div>' +
+                                    '<div class="flex items-center gap-2 flex-wrap">' +
+                                        '<span class="font-mono font-black text-sm text-goldLight">$' + Number(d.amountUSD).toFixed(2) + '</span>' +
+                                        '<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-goldPrimary/15 text-goldLight">' + d.coin + '</span>' +
+                                        badge +
+                                    '</div>' +
+                                    '<div class="text-xs font-mono text-slate-400 mt-1 break-all">TxID: ' + d.txId + '</div>' +
+                                    '<div class="text-[11px] font-mono text-slate-500">' + (d.userEmail||d.userId) + ' · ' + d.createdAt + '</div>' +
+                                '</div>' +
+                                (isPending ? '<div class="flex gap-2 shrink-0">' +
+                                    '<button onclick="approveOrRejectDeposit(\'' + d.id + '\',\'approved\')" class="min-h-[36px] px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-bold">قبول</button>' +
+                                    '<button onclick="approveOrRejectDeposit(\'' + d.id + '\',\'rejected\')" class="min-h-[36px] px-3 py-1 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/30 text-xs font-bold">رفض</button>' +
+                                '</div>' : '') +
+                            '</div>' +
+                        '</div>';
                     }).join('');
             }
 
@@ -2554,20 +2553,31 @@
             const oTbody = document.getElementById('adm-orders-tbody');
             if (oTbody) {
                 oTbody.innerHTML = window.state.orders.length === 0
-                    ? `<tr><td colspan="5" class="py-6 text-center text-xs text-slate-500">لا توجد مبيعات بعد. / No sales yet.</td></tr>`
+                    ? '<tr><td colspan="5" class="py-6 text-center text-xs text-slate-500">لا توجد مبيعات بعد.</td></tr>'
                     : window.state.orders.map(o => {
-                        const title = lang === 'ar' ? (o.productTitleAr || o.productTitleEn) : (o.productTitleEn || o.productTitleAr);
-                        return `
-                            <tr class="hover:bg-obsidian/50">
-                                <td class="py-3 px-4 font-mono text-xs text-goldLight">${o.id}</td>
-                                <td class="py-3 px-4 font-bold text-sm text-white">${title}</td>
-                                <td class="py-3 px-4 font-mono text-xs text-slate-300">${o.userEmail || o.userId}</td>
-                                <td class="py-3 px-4 font-mono font-bold text-emerald-400">$${Number(o.priceUSD).toFixed(2)}</td>
-                                <td class="py-3 px-4 text-xs text-slate-400">${o.createdAt}</td>
-                            </tr>
-                        `;
+                        const title = lang === 'ar' ? (o.productTitleAr||o.productTitleEn) : (o.productTitleEn||o.productTitleAr);
+                        return '<tr class="hover:bg-obsidian/50">' +
+                            '<td class="py-3 px-4 font-mono text-xs text-goldLight">' + o.id + '</td>' +
+                            '<td class="py-3 px-4 font-bold text-sm text-white">' + title + '</td>' +
+                            '<td class="py-3 px-4 font-mono text-xs text-slate-300">' + (o.userEmail||o.userId) + '</td>' +
+                            '<td class="py-3 px-4 font-mono font-bold text-emerald-400">$' + Number(o.priceUSD).toFixed(2) + '</td>' +
+                            '<td class="py-3 px-4 text-xs text-slate-400">' + o.createdAt + '</td>' +
+                        '</tr>';
                     }).join('');
             }
+
+            // Settings pre-fill
+            const sAnn = document.getElementById('set-announcement');
+            const sBtc = document.getElementById('set-btc');
+            const sLtc = document.getElementById('set-ltc');
+            const sUsd = document.getElementById('set-usdt');
+            const sSec = document.getElementById('set-secret');
+            const cfg = window.state.settings || {};
+            if (sAnn) sAnn.value = cfg.announcementText || '';
+            if (sBtc) sBtc.value = cfg.BTC || '';
+            if (sLtc) sLtc.value = cfg.LTC || '';
+            if (sUsd) sUsd.value = cfg.USDT_BEP20 || '';
+            if (sSec) sSec.value = cfg.adminSecretCode || '';
 
             // Users Table (Desktop) & Cards (Mobile)
             const uTbody = document.getElementById('adm-users-tbody');
@@ -2611,19 +2621,6 @@
                         </div>
                     `).join('');
             }
-
-            // Pre-fill Settings Form
-            const setAnn = document.getElementById('set-announcement');
-            const setBtc = document.getElementById('set-btc');
-            const setLtc = document.getElementById('set-ltc');
-            const setUsdt = document.getElementById('set-usdt');
-            const setSecret = document.getElementById('set-secret');
-            const cfg = window.state.settings;
-            if (setAnn && !setAnn._dirty) setAnn.value = cfg.announcementText || '';
-            if (setBtc && !setBtc._dirty) setBtc.value = cfg.BTC || '';
-            if (setLtc && !setLtc._dirty) setLtc.value = cfg.LTC || '';
-            if (setUsdt && !setUsdt._dirty) setUsdt.value = cfg.USDT_BEP20 || '';
-            if (setSecret && !setSecret._dirty) setSecret.value = cfg.adminSecretCode || '';
 
             // Vouchers List
             const vList = document.getElementById('adm-vouchers-list');
@@ -2850,7 +2847,7 @@
             }, 3200);
         };
 
-        // ==================== BOOT SEQUENCE (after ALL functions defined) ====================
+        // ==================== BOOT (after ALL functions defined) ====================
         loadLocalMirror();
         window.initRoutingAndUI();
         initFirebaseBackend();

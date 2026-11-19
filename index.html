@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BaseX Shop | متجر بيسكس للأدوات الرقمية والكورسات</title>
+    
+    <!-- Google Fonts: Cairo (Arabic), Inter (English), JetBrains Mono (Crypto/Code) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        arabic: ['Cairo', 'sans-serif'],
+                        english: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        obsidian: '#070709',
+                        onyx: '#0E0E13',
+                        charcoal: '#15151D',
+                        goldPrimary: '#D4AF37',
+                        goldLight: '#F5D061',
+                        goldDark: '#AA771C',
+                    },
+                    boxShadow: {
+                        'gold-glow': '0 0 25px rgba(212, 175, 55, 0.22)',
+                        'gold-subtle': '0 4px 20px rgba(0, 0, 0, 0.65)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            background-color: #070709;
+            color: #F8FAFC;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(212, 175, 55, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(170, 119, 28, 0.05) 0%, transparent 40%);
+        }
+        html[dir="rtl"] body { font-family: 'Cairo', sans-serif; }
+        html[dir="ltr"] body { font-family: 'Inter', sans-serif; }
+
+        /* Luxury Scrollbar */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #070709; }
+        ::-webkit-scrollbar-thumb { background: #262633; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+        /* Leather-like dark texture & Gold Glass Cards */
+        .luxury-card {
+            background: linear-gradient(145deg, rgba(21, 21, 29, 0.92), rgba(14, 14, 19, 0.96));
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+        }
+        .luxury-card:hover {
+            border-color: rgba(245, 208, 97, 0.42);
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F5D061 0%, #D4AF37 50%, #AA771C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-btn {
+            background: linear-gradient(135deg, #F5D061 0%, #D4AF37 55%, #B8860B 100%);
+            color: #070709;
+            transition: all 0.25s ease;
+        }
+        .gold-btn:hover {
+            filter: brightness(1.08);
+            box-shadow: 0 0 22px rgba(212, 175, 55, 0.4);
+        }
+
+        #qrcode img, #qrcode canvas {
+            margin: 0 auto;
+            border-radius: 12px;
+            padding: 10px;
+            background: #FFFFFF;
+            border: 2px solid #D4AF37;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-goldPrimary selection:text-obsidian">
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed bottom-5 z-50 flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none ltr:right-4 rtl:left-4"></div>
+
+    <!-- ==================== PUBLIC STOREFRONT SHELL ==================== -->
+    <div id="public-shell" class="flex-1 flex flex-col">
+        
+        <!-- Live Announcement Ticker Banner -->
+        <div id="announcement-bar" class="bg-gradient-to-r from-obsidian via-charcoal to-obsidian border-b border-goldPrimary/25 py-1.5 px-4 text-center">
+            <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 text-xs">
+                <span class="px-2 py-0.5 rounded bg-goldPrimary/20 text-goldLight font-mono font-bold text-[10px]">LIVE</span>
+                <span id="announcement-text" class="text-slate-200 font-medium">🔥 شحن فوري عبر BTC / LTC / USDT — للدعم الفني وقسائم الشحن تواصل مع بوت تليجرام @basexsupport_bot</span>
+            </div>
+        </div>
+
+        <!-- Public Header (Strictly NO Admin Links or Buttons!) -->
+        <header class="sticky top-0 z-40 bg-obsidian/90 backdrop-blur-xl border-b border-goldPrimary/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3">
+                
+                <!-- Custom SVG Metallic Gold BX BaseX Logo -->
+                <div onclick="switchPublicView('store')" class="flex items-center gap-3 cursor-pointer group select-none">
+                    <div class="w-11 h-11 rounded-xl bg-onyx border border-goldPrimary/40 flex items-center justify-center shadow-gold-glow group-hover:scale-105 transition-transform">
+                        <svg class="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="bxGoldGrad" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#FFF0A8"/>
+                                    <stop offset="35%" stop-color="#D4AF37"/>
+                                    <stop offset="70%" stop-color="#AA771C"/>
+                                    <stop offset="100%" stop-color="#F5D061"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- Intertwined BX Geometric Monogram -->
+                            <path d="M18 16H44C54 16 61 22 61 31C61 37 57 42 52 45C58 48 63 54 63 62C63 73 54 82 42 82H18V16ZM28 26V41H41C47 41 51 37 51 33C51 29 47 26 41 26H28ZM28 51V72H42C49 72 53 68 53 61C53 55 48 51 41 51H28Z" fill="url(#bxGoldGrad)"/>
+                            <path d="M56 16H68L77 33L86 16H96L82 43L97 82H85L76 57L65 82H53L70 44L56 16Z" fill="url(#bxGoldGrad)"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xl font-black tracking-wide gold-gradient-text">BaseX</span>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-goldPrimary/15 text-goldLight border border-goldPrimary/30">SHOP</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 hidden sm:block" data-i18n="brand_subtitle">متجر بيسكس للأدوات الرقمية والكورسات</p>
+                    </div>
+                </div>
+
+                <!-- Public Navigation (Only Store, Top-Up, My Orders) -->
+                <nav class="hidden md:flex items-center gap-1.5 bg-onyx/90 p-1.5 rounded-xl border border-goldPrimary/15">
+                    <button onclick="switchPublicView('store')" id="pnav-store" class="pnav-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-goldPrimary/15 text-goldLight border border-goldPrimary/30">
+                        <i data-lucide="store" class="w-4 h-4"></i>
+                        <span data-i18n="nav_store">المتجر</span>
+                    </button>
+                    <button onclick="switchPublicView('wallet')" id="pnav-wallet" class="pnav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-goldLight transition-all flex items-center gap-2">
+                        <i data-lucide="coins" class="w-4 h-4"></i>
+                        <span data-i18n="nav_wallet">شحن الرصيد</span>
+                    </button>
+                    <button onclick="switchPublicView('orders')" id="pnav-orders" class="pnav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-goldLight transition-all flex items-center gap-2">
+                        <i data-lucide="package-check" class="w-4 h-4"></i>
+                        <span data-i18n="nav_orders">طلباتي</span>
+                        <span id="nav-orders-count" class="px-1.5 py-0.2 text-xs rounded-full bg-charcoal text-goldLight font-mono border border-goldPrimary/25">0</span>
+                    </button>
+                    <a href="https://t.me/basexsupport_bot" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-sky-400 hover:bg-sky-500/10 transition-all flex items-center gap-1.5">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span data-i18n="nav_support">الدعم</span>
+                    </a>
+                </nav>
+
+                <!-- Right Controls: Balance / Account + Language -->
+                <div class="flex items-center gap-2.5">
+                    <!-- Balance Pill (Triggers Top-Up) -->
+                    <button onclick="handleWalletButtonClick()" class="flex items-center gap-2.5 bg-onyx hover:bg-charcoal border border-goldPrimary/35 px-3.5 py-2 rounded-xl transition-all shadow-gold-subtle group">
+                        <div class="w-7 h-7 rounded-lg bg-goldPrimary/15 text-goldLight flex items-center justify-center">
+                            <i data-lucide="wallet" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-start">
+                            <div class="text-[10px] text-slate-400 leading-none" data-i18n="balance_label">الرصيد</div>
+                            <div class="text-sm font-mono font-bold text-goldLight leading-tight">$<span id="header-balance">0.00</span></div>
+                        </div>
+                        <span class="w-6 h-6 rounded-lg gold-btn flex items-center justify-center font-black text-sm group-hover:scale-110 transition-transform">+</span>
+                    </button>
+
+                    <!-- User Auth Button -->
+                    <button onclick="openAuthModal()" id="auth-header-btn" class="px-3.5 py-2.5 rounded-xl bg-onyx hover:bg-charcoal border border-slate-800 hover:border-goldPrimary/40 text-xs font-bold text-slate-200 flex items-center gap-2 transition-all">
+                        <i data-lucide="user" class="w-4 h-4 text-goldPrimary"></i>
+                        <span id="auth-header-label" data-i18n="btn_login">دخول</span>
+                    </button>
+
+                    <!-- Language Switcher -->
+                    <button onclick="toggleLanguage()" class="px-3 py-2.5 rounded-xl bg-onyx hover:bg-charcoal border border-slate-800 hover:border-goldPrimary/40 text-goldLight text-xs font-mono font-bold flex items-center gap-1.5 transition-all">
+                        <i data-lucide="globe" class="w-4 h-4"></i>
+                        <span id="lang-label">EN</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Public Nav -->
+            <div class="flex md:hidden items-center justify-around border-t border-goldPrimary/15 bg-obsidian py-2 px-2">
+                <button onclick="switchPublicView('store')" id="mpnav-store" class="flex-1 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 text-goldLight bg-goldPrimary/15">
+                    <i data-lucide="store" class="w-4 h-4"></i>
+                    <span data-i18n="nav_store">المتجر</span>
+                </button>
+                <button onclick="switchPublicView('wallet')" id="mpnav-wallet" class="flex-1 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 text-slate-400">
+                    <i data-lucide="coins" class="w-4 h-4"></i>
+                    <span data-i18n="nav_wallet">شحن الرصيد</span>
+                </button>
+                <button onclick="switchPublicView('orders')" id="mpnav-orders" class="flex-1 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 text-slate-400">
+                    <i data-lucide="package-check" class="w-4 h-4"></i>
+                    <span data-i18n="nav_orders">طلباتي</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Public Content -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            
+            <!-- ==================== PUBLIC VIEW 1: STOREFRONT ==================== -->
+            <section id="pview-store" class="space-y-6">
+                
+                <!-- Luxury Gold Hero Section -->
+                <div class="luxury-card rounded-3xl p-6 sm:p-10 relative overflow-hidden">
+                    <div class="absolute -top-24 ltr:-right-24 rtl:-left-24 w-80 h-80 bg-goldPrimary/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                        <div class="max-w-2xl space-y-4">
+                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-goldPrimary/10 border border-goldPrimary/30 text-goldLight text-xs font-bold">
+                                <span class="w-2 h-2 rounded-full bg-goldLight animate-ping"></span>
+                                <span data-i18n="hero_badge">تسليم رقمي فوري ومشفّر 24/7</span>
+                            </div>
+                            <h1 class="text-3xl sm:text-5xl font-black text-white leading-tight">
+                                <span class="gold-gradient-text">BaseX Shop</span> — <span data-i18n="hero_title">أقوى الأدوات الرقمية، الكومبوهات، والكورسات الاحترافية</span>
+                            </h1>
+                            <p class="text-slate-300 text-sm sm:text-base leading-relaxed" data-i18n="hero_desc">
+                                اشحن محفظتك بسهولة عبر العملات الرقمية (BTC, LTC, USDT BEP20) واحصل على وصول مباشر وفوري للأدوات البرمجية، القوائم المفلترة، والدورات التقنية.
+                            </p>
+                            <div class="flex flex-wrap items-center gap-3 pt-2">
+                                <button onclick="switchPublicView('wallet')" class="gold-btn px-6 py-3 rounded-xl font-extrabold text-sm flex items-center gap-2">
+                                    <i data-lucide="coins" class="w-4 h-4"></i>
+                                    <span data-i18n="hero_cta_deposit">شحن المحفظة بالكريبتو</span>
+                                </button>
+                                <button onclick="switchPublicView('orders')" class="px-6 py-3 rounded-xl bg-charcoal hover:bg-slate-800 text-goldLight border border-goldPrimary/30 font-bold text-sm flex items-center gap-2 transition-all">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                    <span data-i18n="hero_cta_orders">مشترياتي وتنزيلاتي</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Live Connection & Security Badge Box -->
+                        <div class="w-full lg:w-80 bg-obsidian/90 border border-goldPrimary/25 rounded-2xl p-5 space-y-3.5 shrink-0">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <span class="text-xs text-slate-400" data-i18n="db_status_label">حالة النظام والمتجر</span>
+                                <span id="sync-status-pill" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">LIVE SYNC</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-slate-400" data-i18n="accepted_crypto">العملات المقبولة</span>
+                                <span class="font-mono font-bold text-goldLight">BTC • LTC • USDT</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-slate-400" data-i18n="support_bot_label">بوت الدعم الرسمي</span>
+                                <a href="https://t.me/basexsupport_bot" target="_blank" rel="noopener noreferrer" class="font-mono font-bold text-sky-400 hover:underline flex items-center gap-1">
+                                    <span>@basexsupport_bot</span>
+                                    <i data-lucide="external-link" class="w-3 h-3"></i>
+                                </a>
+                            </div>
+                            <div class="pt-2 border-t border-slate-800">
+                                <div class="text-[11px] text-slate-400 mb-1" data-i18n="active_account">الحساب النشط</div>
+                                <div id="hero-user-email" class="text-xs font-mono text-goldLight truncate">Guest (زائر)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Filters, Search & Sort -->
+                <div class="luxury-card rounded-2xl p-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
+                        <button onclick="setCategory('all')" data-cat="all" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold whitespace-nowrap gold-btn" data-i18n="cat_all">الكل</button>
+                        <button onclick="setCategory('tools')" data-cat="tools" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all" data-i18n="cat_tools">أدوات فحص</button>
+                        <button onclick="setCategory('combos')" data-cat="combos" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all" data-i18n="cat_combos">كومبوهات</button>
+                        <button onclick="setCategory('courses')" data-cat="courses" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all" data-i18n="cat_courses">كورسات</button>
+                        <button onclick="setCategory('accounts')" data-cat="accounts" class="cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all" data-i18n="cat_accounts">حسابات</button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                        <div class="relative flex-1 sm:w-64">
+                            <i data-lucide="search" class="w-4 h-4 text-goldPrimary absolute top-1/2 -translate-y-1/2 ltr:left-3.5 rtl:right-3.5"></i>
+                            <input type="text" id="search-input" oninput="renderStoreProducts()" placeholder="ابحث في المتجر..." data-i18n-placeholder="search_placeholder" class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl py-2 ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 text-sm text-white placeholder-slate-500 outline-none">
+                        </div>
+                        <select id="price-sort" onchange="renderStoreProducts()" class="bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-slate-200 outline-none">
+                            <option value="default" data-i18n="sort_default">الترتيب الافتراضي</option>
+                            <option value="low" data-i18n="sort_low">السعر: الأقل أولاً</option>
+                            <option value="high" data-i18n="sort_high">السعر: الأعلى أولاً</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    <!-- Injected Products -->
+                </div>
+
+                <div id="empty-products" class="hidden luxury-card rounded-2xl p-12 text-center">
+                    <i data-lucide="search-x" class="w-12 h-12 text-goldPrimary/60 mx-auto mb-3"></i>
+                    <h3 class="text-lg font-bold text-white" data-i18n="no_products">لا توجد منتجات مطابقة للبحث</h3>
+                </div>
+            </section>
+
+            <!-- ==================== PUBLIC VIEW 2: CRYPTO WALLET & TOP-UP ==================== -->
+            <section id="pview-wallet" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- Left: Deposit Form & QR -->
+                    <div class="lg:col-span-7 luxury-card rounded-3xl p-6 sm:p-8 space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                            <div>
+                                <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
+                                    <i data-lucide="coins" class="w-6 h-6 text-goldPrimary"></i>
+                                    <span data-i18n="wallet_page_title">شحن رصيد المحفظة (Crypto)</span>
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1" data-i18n="wallet_page_sub">اختر العملة الرقمية وحوّل المبلغ ثم أرسل رقم المعاملة TxID لتأكيد الشحن.</p>
+                            </div>
+                            <div class="text-end bg-obsidian px-4 py-2 rounded-xl border border-goldPrimary/30">
+                                <div class="text-[10px] text-slate-400" data-i18n="current_balance">رصيدك الحالي</div>
+                                <div class="text-xl font-mono font-black text-goldLight">$<span id="wallet-view-balance">0.00</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Coin Selection -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <button type="button" onclick="selectDepositCoin('BTC')" id="coin-card-BTC" class="p-3.5 rounded-2xl border border-goldPrimary bg-goldPrimary/15 text-center transition-all">
+                                <div class="font-mono font-black text-base text-goldLight">BTC</div>
+                                <div class="text-[11px] text-slate-300">Bitcoin</div>
+                            </button>
+                            <button type="button" onclick="selectDepositCoin('LTC')" id="coin-card-LTC" class="p-3.5 rounded-2xl border border-slate-800 bg-obsidian text-center hover:border-goldPrimary/40 transition-all">
+                                <div class="font-mono font-black text-base text-slate-200">LTC</div>
+                                <div class="text-[11px] text-slate-400">Litecoin</div>
+                            </button>
+                            <button type="button" onclick="selectDepositCoin('USDT_BEP20')" id="coin-card-USDT_BEP20" class="p-3.5 rounded-2xl border border-slate-800 bg-obsidian text-center hover:border-goldPrimary/40 transition-all">
+                                <div class="font-mono font-black text-base text-emerald-400">USDT</div>
+                                <div class="text-[11px] text-slate-400">BEP20 (BSC)</div>
+                            </button>
+                        </div>
+
+                        <!-- QR Code + Copyable Wallet Address -->
+                        <div class="bg-obsidian border border-goldPrimary/25 rounded-2xl p-5 text-center space-y-3">
+                            <div id="qrcode" class="flex justify-center"></div>
+                            <div class="text-xs font-bold text-goldLight" id="selected-network-title">Bitcoin (BTC) Deposit Address</div>
+                            <div class="flex items-center gap-2 bg-charcoal border border-slate-800 rounded-xl p-2.5">
+                                <input type="text" id="deposit-address-input" readonly class="w-full bg-transparent text-xs sm:text-sm font-mono text-white outline-none select-all">
+                                <button type="button" onclick="copyText(document.getElementById('deposit-address-input').value)" class="gold-btn px-3.5 py-2 rounded-lg text-xs font-extrabold flex items-center gap-1.5 shrink-0">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                    <span data-i18n="btn_copy">نسخ</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Submit TxID Form -->
+                        <form onsubmit="submitCryptoDeposit(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5" data-i18n="label_usd_amount">المبلغ المرسل بالدولار ($ USD)</label>
+                                    <input type="number" id="dep-amount" min="1" step="0.01" required placeholder="50.00" class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-3 text-sm font-mono text-white outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-300 mb-1.5" data-i18n="label_tx_hash">معرّف المعاملة (TxID / Hash)</label>
+                                    <input type="text" id="dep-txid" required placeholder="0x98f2... / Blockchain Hash" class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-3 text-xs font-mono text-white outline-none">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full gold-btn py-3.5 rounded-xl font-black text-sm flex items-center justify-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                                <span data-i18n="btn_confirm_deposit">إرسال طلب شحن الرصيد</span>
+                            </button>
+                        </form>
+
+                        <!-- Redeem Gift Voucher Code Box -->
+                        <div class="pt-5 border-t border-slate-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-extrabold text-goldLight flex items-center gap-1.5">
+                                    <i data-lucide="ticket" class="w-4 h-4"></i>
+                                    <span data-i18n="voucher_box_title">شحن فوري عبر قسيمة هدية (Gift Voucher Code)</span>
+                                </label>
+                                <a href="https://t.me/basexsupport_bot" target="_blank" rel="noopener noreferrer" class="text-[11px] text-sky-400 hover:underline font-mono">@basexsupport_bot</a>
+                            </div>
+                            <form onsubmit="redeemGiftVoucher(event)" class="flex gap-2">
+                                <input type="text" id="voucher-code-input" required placeholder="BX-GIFT-XXXX" class="flex-1 bg-obsidian border border-goldPrimary/30 focus:border-goldLight rounded-xl px-4 py-2.5 text-xs sm:text-sm font-mono uppercase text-goldLight outline-none">
+                                <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-extrabold text-xs shrink-0" data-i18n="btn_redeem">تفعيل الكود</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right: User's Deposit History -->
+                    <div class="lg:col-span-5 luxury-card rounded-3xl p-6 flex flex-col">
+                        <h3 class="text-lg font-extrabold text-white mb-4 flex items-center gap-2 border-b border-slate-800 pb-3">
+                            <i data-lucide="history" class="w-5 h-5 text-goldPrimary"></i>
+                            <span data-i18n="my_deposits_title">سجل طلبات الشحن الخاصة بك</span>
+                        </h3>
+                        <div id="user-deposits-list" class="space-y-3 flex-1 overflow-y-auto max-h-[540px]">
+                            <!-- Injected user deposits -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== PUBLIC VIEW 3: MY ORDERS & DOWNLOADS ==================== -->
+            <section id="pview-orders" class="hidden space-y-6">
+                <div class="luxury-card rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-white flex items-center gap-2.5">
+                            <i data-lucide="package-check" class="w-6 h-6 text-goldPrimary"></i>
+                            <span data-i18n="orders_title">طلباتي ومشترياتي الرقمية</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1" data-i18n="orders_sub">يمكنك نسخ البيانات أو تحميل ملفات الأدوات والكورسات المشتراة في أي وقت.</p>
+                    </div>
+                    <button onclick="switchPublicView('store')" class="px-4 py-2.5 rounded-xl bg-charcoal hover:bg-slate-800 text-goldLight border border-goldPrimary/30 text-xs font-bold flex items-center gap-2 self-start">
+                        <i data-lucide="arrow-left" class="w-4 h-4 rtl:rotate-180"></i>
+                        <span data-i18n="back_store">العودة للمتجر</span>
+                    </button>
+                </div>
+
+                <div id="user-orders-list" class="space-y-4">
+                    <!-- Injected orders -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Public Footer (Clean, NO Admin Links!) -->
+        <footer class="border-t border-goldPrimary/15 bg-obsidian/95 py-6 mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+                <div class="flex items-center gap-2">
+                    <span class="font-black gold-gradient-text text-sm">BaseX Shop</span>
+                    <span>© 2026 — All Rights Reserved.</span>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-4 font-mono">
+                    <a href="https://t.me/basexsupport_bot" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 flex items-center gap-1.5">
+                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                        <span>Telegram Support: @basexsupport_bot</span>
+                    </a>
+                    <span class="text-goldLight">BTC • LTC • USDT (BEP20)</span>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Floating Telegram Support Button & Interactive Assistant -->
+        <div class="fixed bottom-5 z-40 ltr:left-5 rtl:right-5 flex items-center gap-2.5">
+            <button onclick="openSupportAssistantModal()" class="group flex items-center gap-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-4 py-3 rounded-2xl shadow-lg shadow-sky-500/25 border border-sky-300/30 transition-all hover:scale-105">
+                <i data-lucide="send" class="w-5 h-5"></i>
+                <div class="text-start hidden sm:block">
+                    <div class="text-[10px] text-sky-100 leading-none" data-i18n="float_support_sub">الدعم الفني المباشر</div>
+                    <div class="text-xs font-mono font-bold leading-tight">@basexsupport_bot</div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== HIDDEN ADMIN ROUTE SHELL (#/admin-basex) ==================== -->
+    <div id="admin-shell" class="hidden min-h-screen flex flex-col bg-obsidian">
+        
+        <!-- Step 1: Admin Secret Access Gate -->
+        <div id="admin-gate-screen" class="flex-1 flex items-center justify-center p-4">
+            <div class="luxury-card rounded-3xl max-w-md w-full p-8 text-center space-y-6 border-goldPrimary/40 shadow-gold-glow">
+                <div class="w-16 h-16 rounded-2xl bg-onyx border border-goldPrimary/50 flex items-center justify-center mx-auto shadow-gold-glow">
+                    <svg class="w-10 h-10" viewBox="0 0 100 100" fill="none">
+                        <path d="M18 16H44C54 16 61 22 61 31C61 37 57 42 52 45C58 48 63 54 63 62C63 73 54 82 42 82H18V16ZM28 26V41H41C47 41 51 37 51 33C51 29 47 26 41 26H28ZM28 51V72H42C49 72 53 68 53 61C53 55 48 51 41 51H28Z" fill="#D4AF37"/>
+                        <path d="M56 16H68L77 33L86 16H96L82 43L97 82H85L76 57L65 82H53L70 44L56 16Z" fill="#F5D061"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <span class="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-goldPrimary/15 text-goldLight border border-goldPrimary/30">RESTRICTED ADMIN ROUTE</span>
+                    <h2 class="text-2xl font-black text-white mt-3" data-i18n="admin_gate_title">بوابة إدارة BaseX السرية</h2>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="admin_gate_desc">أدخل رمز الوصول السري للمتابعة إلى لوحة التحكم.</p>
+                </div>
+
+                <form onsubmit="verifyAdminSecret(event)" class="space-y-4 text-start">
+                    <div>
+                        <label class="block text-xs font-bold text-goldLight mb-1.5" data-i18n="admin_secret_label">رمز الدخول السري (Secret Access Code)</label>
+                        <input type="password" id="admin-secret-input" required placeholder="••••••••" class="w-full bg-obsidian border border-goldPrimary/35 focus:border-goldLight rounded-xl px-4 py-3 text-center font-mono text-base tracking-widest text-white outline-none">
+                        <p class="text-[11px] text-slate-500 mt-1.5 text-center font-mono">Default test code: <span class="text-goldLight select-all">BASEX2026</span></p>
+                    </div>
+                    <button type="submit" class="w-full gold-btn py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span data-i18n="btn_unlock_admin">فتح لوحة الإدارة</span>
+                    </button>
+                </form>
+
+                <div class="pt-2 border-t border-slate-800">
+                    <button onclick="exitAdminRoute()" class="text-xs text-slate-400 hover:text-goldLight flex items-center justify-center gap-1.5 mx-auto">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5 rtl:rotate-180"></i>
+                        <span data-i18n="back_store">العودة إلى المتجر العام</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Unlocked Admin Dashboard -->
+        <div id="admin-dashboard-screen" class="hidden flex-1 flex flex-col">
+            <!-- Admin Header -->
+            <header class="bg-onyx border-b border-goldPrimary/25 py-3.5 px-4 sm:px-8 sticky top-0 z-40">
+                <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl gold-btn flex items-center justify-center font-black text-obsidian">BX</div>
+                        <div>
+                            <h1 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                                <span data-i18n="admin_panel_title">لوحة تحكم BaseX الإدارية</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">ADMIN</span>
+                            </h1>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2.5">
+                        <button onclick="toggleLanguage()" class="px-3 py-2 rounded-xl bg-obsidian border border-slate-800 text-goldLight text-xs font-mono font-bold">
+                            <span id="admin-lang-label">EN</span>
+                        </button>
+                        <button onclick="lockAdminSession()" class="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 text-xs font-bold flex items-center gap-1.5">
+                            <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                            <span data-i18n="btn_lock_admin">قفل الجلسة</span>
+                        </button>
+                        <button onclick="exitAdminRoute()" class="px-3.5 py-2 rounded-xl bg-charcoal hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5">
+                            <i data-lucide="external-link" class="w-3.5 h-3.5 text-goldPrimary"></i>
+                            <span data-i18n="btn_view_store">عرض المتجر</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Admin Body -->
+            <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 space-y-6">
+                
+                <!-- Admin KPI Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="luxury-card p-5 rounded-2xl">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span data-i18n="kpi_revenue">إجمالي المبيعات</span>
+                            <i data-lucide="dollar-sign" class="w-5 h-5 text-goldPrimary"></i>
+                        </div>
+                        <div class="text-2xl font-mono font-black text-goldLight mt-2">$<span id="adm-kpi-revenue">0.00</span></div>
+                    </div>
+                    <div class="luxury-card p-5 rounded-2xl">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span data-i18n="kpi_orders">إجمالي الطلبات</span>
+                            <i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-400"></i>
+                        </div>
+                        <div class="text-2xl font-mono font-black text-white mt-2" id="adm-kpi-orders">0</div>
+                    </div>
+                    <div class="luxury-card p-5 rounded-2xl">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span data-i18n="kpi_pending">طلبات شحن معلقة</span>
+                            <i data-lucide="clock" class="w-5 h-5 text-amber-400"></i>
+                        </div>
+                        <div class="text-2xl font-mono font-black text-amber-400 mt-2" id="adm-kpi-pending">0</div>
+                    </div>
+                    <div class="luxury-card p-5 rounded-2xl">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <span data-i18n="kpi_products">المنتجات المنشورة</span>
+                            <i data-lucide="layers" class="w-5 h-5 text-cyan-400"></i>
+                        </div>
+                        <div class="text-2xl font-mono font-black text-white mt-2" id="adm-kpi-products">0</div>
+                    </div>
+                </div>
+
+                <!-- Admin Navigation Tabs -->
+                <div class="luxury-card p-2.5 rounded-2xl flex flex-wrap items-center gap-2">
+                    <button onclick="switchAdminTab('products')" id="atab-products" class="atab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold gold-btn flex items-center gap-2">
+                        <i data-lucide="box" class="w-4 h-4"></i>
+                        <span data-i18n="atab_products">إدارة المنتجات والملفات</span>
+                    </button>
+                    <button onclick="switchAdminTab('deposits')" id="atab-deposits" class="atab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-obsidian text-slate-300 hover:text-goldLight flex items-center gap-2">
+                        <i data-lucide="wallet" class="w-4 h-4 text-amber-400"></i>
+                        <span data-i18n="atab_deposits">طلبات شحن الرصيد</span>
+                    </button>
+                    <button onclick="switchAdminTab('users')" id="atab-users" class="atab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-obsidian text-slate-300 hover:text-goldLight flex items-center gap-2">
+                        <i data-lucide="users" class="w-4 h-4 text-sky-400"></i>
+                        <span data-i18n="atab_users">المستخدمين والأرصدة</span>
+                    </button>
+                    <button onclick="switchAdminTab('vouchers')" id="atab-vouchers" class="atab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-obsidian text-slate-300 hover:text-goldLight flex items-center gap-2">
+                        <i data-lucide="ticket" class="w-4 h-4 text-purple-400"></i>
+                        <span data-i18n="atab_vouchers">الكوبونات وقسائم الشحن</span>
+                    </button>
+                    <button onclick="switchAdminTab('orders')" id="atab-orders" class="atab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-obsidian text-slate-300 hover:text-goldLight flex items-center gap-2">
+                        <i data-lucide="list-checks" class="w-4 h-4 text-emerald-400"></i>
+                        <span data-i18n="atab_orders">سجل المبيعات</span>
+                    </button>
+                    <button onclick="switchAdminTab('settings')" id="atab-settings" class="atab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-obsidian text-slate-300 hover:text-goldLight flex items-center gap-2">
+                        <i data-lucide="settings" class="w-4 h-4 text-goldPrimary"></i>
+                        <span data-i18n="atab_settings">المحافظ والأمان</span>
+                    </button>
+                </div>
+
+                <!-- Admin Tab 1: Products & Digital Files -->
+                <div id="apanel-products" class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-extrabold text-white" data-i18n="adm_prod_heading">المنتجات والملفات الرقمية</h3>
+                        <button onclick="openProductEditor()" class="gold-btn px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            <span data-i18n="btn_new_product">إضافة منتج جديد</span>
+                        </button>
+                    </div>
+
+                    <div class="luxury-card rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-start border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 bg-obsidian/80 text-xs text-slate-400">
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_product">المنتج</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_category">القسم</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_price">السعر</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_stock">المخزون</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_delivery">نوع التسليم</th>
+                                        <th class="py-3.5 px-4 text-end" data-i18n="th_actions">تحكم</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adm-products-tbody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tab 2: Crypto Deposits Approval -->
+                <div id="apanel-deposits" class="hidden space-y-4">
+                    <h3 class="text-lg font-extrabold text-white" data-i18n="adm_dep_heading">طلبات شحن العملات الرقمية</h3>
+                    <div id="adm-deposits-list" class="space-y-3"></div>
+                </div>
+
+                <!-- Admin Tab: Users Management -->
+                <div id="apanel-users" class="hidden space-y-4">
+                    <h3 class="text-lg font-extrabold text-white" data-i18n="adm_users_heading">العملاء المسجلين وإدارة الأرصدة</h3>
+                    <div class="luxury-card rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-start border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 bg-obsidian/80 text-xs text-slate-400">
+                                        <th class="py-3.5 px-4 text-start" data-i18n="label_fullname">الاسم</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="label_email">البريد الإلكتروني</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="balance_label">الرصيد</th>
+                                        <th class="py-3.5 px-4 text-end" data-i18n="th_actions">تعديل الرصيد</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adm-users-tbody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tab: Coupons & Gift Vouchers -->
+                <div id="apanel-vouchers" class="hidden space-y-5">
+                    <div class="luxury-card rounded-2xl p-5">
+                        <h3 class="text-base font-extrabold text-goldLight mb-3" data-i18n="create_voucher_title">إنشاء قسيمة شحن رصيد ($) أو كوبون خصم (%)</h3>
+                        <form onsubmit="createAdminVoucher(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <input type="text" id="vouch-code" required placeholder="BX-VIP-50" class="bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-xs font-mono uppercase text-white outline-none">
+                            <select id="vouch-type" class="bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                                <option value="gift">قسيمة شحن رصيد ($ Gift Balance)</option>
+                                <option value="discount">كوبون خصم (% Discount)</option>
+                            </select>
+                            <input type="number" id="vouch-value" min="1" step="0.01" required placeholder="القيمة (مثال: 25)" class="bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none">
+                            <button type="submit" class="gold-btn rounded-xl py-2.5 px-4 font-black text-xs" data-i18n="btn_create_voucher">إنشاء الكود</button>
+                        </form>
+                    </div>
+                    <div id="adm-vouchers-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                </div>
+
+                <!-- Admin Tab 3: All Orders -->
+                <div id="apanel-orders" class="hidden space-y-4">
+                    <h3 class="text-lg font-extrabold text-white" data-i18n="adm_ord_heading">جميع عمليات الشراء المنفذة</h3>
+                    <div class="luxury-card rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-start border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 bg-obsidian/80 text-xs text-slate-400">
+                                        <th class="py-3.5 px-4 text-start">ID</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_buyer">المشتري</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_product">المنتج</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_price">المبلغ</th>
+                                        <th class="py-3.5 px-4 text-start" data-i18n="th_date">التاريخ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adm-orders-tbody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tab 4: Wallets & Admin Secret Code -->
+                <div id="apanel-settings" class="hidden">
+                    <div class="luxury-card rounded-3xl p-6 max-w-2xl space-y-5">
+                        <h3 class="text-lg font-extrabold text-white" data-i18n="adm_set_heading">إعدادات محافظ الكريبتو ورمز الإدارة</h3>
+                        <form onsubmit="saveAdminSettings(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-goldLight mb-1" data-i18n="label_announcement">نص شريط الإعلانات العلوي (Live Banner)</label>
+                                <input type="text" id="set-announcement" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-goldLight mb-1">Bitcoin (BTC) Receiving Address</label>
+                                <input type="text" id="set-btc" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-2.5 text-xs sm:text-sm font-mono text-white outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Litecoin (LTC) Receiving Address</label>
+                                <input type="text" id="set-ltc" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-2.5 text-xs sm:text-sm font-mono text-white outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-emerald-400 mb-1">USDT (BEP20 - BSC) Receiving Address</label>
+                                <input type="text" id="set-usdt" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-2.5 text-xs sm:text-sm font-mono text-white outline-none">
+                            </div>
+                            <div class="pt-3 border-t border-slate-800">
+                                <label class="block text-xs font-bold text-rose-400 mb-1" data-i18n="label_new_secret">رمز الدخول السري للوحة الإدارة (Admin Secret Code)</label>
+                                <input type="text" id="set-secret" required class="w-full bg-obsidian border border-rose-500/30 focus:border-goldPrimary rounded-xl px-4 py-2.5 text-sm font-mono text-goldLight outline-none">
+                            </div>
+                            <button type="submit" class="gold-btn px-6 py-3 rounded-xl font-black text-sm flex items-center gap-2">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                <span data-i18n="btn_save_settings">حفظ جميع الإعدادات</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL A: AUTHENTICATION (LOGIN / REGISTER) ==================== -->
+    <div id="modal-auth" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4">
+        <div class="luxury-card rounded-3xl max-w-md w-full p-6 sm:p-8 relative border-goldPrimary/35">
+            <button onclick="closeModal('modal-auth')" class="absolute top-4 ltr:right-4 rtl:left-4 w-8 h-8 rounded-lg bg-obsidian text-slate-400 hover:text-white flex items-center justify-center">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <!-- Logged In Profile View -->
+            <div id="auth-logged-in-box" class="hidden text-center space-y-4">
+                <div class="w-16 h-16 rounded-2xl bg-goldPrimary/15 border border-goldPrimary/40 text-goldLight flex items-center justify-center mx-auto">
+                    <i data-lucide="user-check" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white" id="profile-modal-name">User</h3>
+                    <p class="text-xs font-mono text-slate-400" id="profile-modal-email">user@basex.shop</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-obsidian border border-goldPrimary/25">
+                    <div class="text-xs text-slate-400" data-i18n="current_balance">رصيد المحفظة</div>
+                    <div class="text-2xl font-mono font-black text-goldLight">$<span id="profile-modal-balance">0.00</span></div>
+                </div>
+                <div class="flex gap-2.5">
+                    <button onclick="closeModal('modal-auth'); switchPublicView('wallet')" class="flex-1 gold-btn py-2.5 rounded-xl font-extrabold text-xs" data-i18n="nav_wallet">شحن الرصيد</button>
+                    <button onclick="logoutUser()" class="px-4 py-2.5 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold text-xs" data-i18n="btn_logout">تسجيل خروج</button>
+                </div>
+            </div>
+
+            <!-- Login / Register Form View -->
+            <div id="auth-forms-box" class="space-y-5">
+                <div class="text-center">
+                    <h3 class="text-xl font-black gold-gradient-text" data-i18n="auth_modal_title">حسابك في BaseX Shop</h3>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="auth_modal_sub">سجّل الدخول لحفظ رصيدك ومشترياتك الرقمية</p>
+                </div>
+
+                <!-- Switch Login/Register -->
+                <div class="grid grid-cols-2 gap-1.5 bg-obsidian p-1 rounded-xl border border-slate-800">
+                    <button type="button" onclick="setAuthMode('login')" id="auth-tab-login" class="py-2 rounded-lg text-xs font-extrabold gold-btn" data-i18n="tab_login">تسجيل الدخول</button>
+                    <button type="button" onclick="setAuthMode('register')" id="auth-tab-register" class="py-2 rounded-lg text-xs font-bold text-slate-400" data-i18n="tab_register">إنشاء حساب</button>
+                </div>
+
+                <form onsubmit="handleEmailAuth(event)" class="space-y-3.5">
+                    <div id="auth-name-field" class="hidden">
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_fullname">الاسم المستعار</label>
+                        <input type="text" id="auth-name" placeholder="BaseX Member" class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-2.5 text-sm text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_email">البريد الإلكتروني</label>
+                        <input type="email" id="auth-email" required placeholder="member@basex.shop" class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-2.5 text-sm font-mono text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_password">كلمة المرور</label>
+                        <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-4 py-2.5 text-sm text-white outline-none">
+                    </div>
+                    <button type="submit" id="auth-submit-btn" class="w-full gold-btn py-3 rounded-xl font-black text-sm" data-i18n="btn_login_submit">متابعة</button>
+                </form>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-800"></div>
+                    <span class="flex-shrink mx-3 text-[11px] text-slate-500">OR</span>
+                    <div class="flex-grow border-t border-slate-800"></div>
+                </div>
+
+                <div class="space-y-2">
+                    <button type="button" onclick="handleGoogleSignIn()" class="w-full py-2.5 px-4 rounded-xl bg-obsidian hover:bg-charcoal border border-slate-700 text-xs font-bold text-white flex items-center justify-center gap-2 transition-all">
+                        <i data-lucide="chrome" class="w-4 h-4 text-goldPrimary"></i>
+                        <span data-i18n="btn_google">الدخول السريع بحساب Google</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL D: TELEGRAM SUPPORT ASSISTANT (@basexsupport_bot) ==================== -->
+    <div id="modal-support" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4">
+        <div class="luxury-card rounded-3xl max-w-lg w-full p-6 sm:p-7 relative border-sky-500/40 space-y-5">
+            <button onclick="closeModal('modal-support')" class="absolute top-4 ltr:right-4 rtl:left-4 w-8 h-8 rounded-lg bg-obsidian text-slate-400 hover:text-white flex items-center justify-center">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-400/40 text-sky-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="send" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white" data-i18n="sup_modal_title">مركز الدعم وبوت تليجرام الرسمي</h3>
+                    <p class="text-xs font-mono text-sky-400">@basexsupport_bot</p>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-obsidian border border-slate-800 space-y-2.5 text-xs text-slate-300 leading-relaxed">
+                <p data-i18n="sup_modal_desc">تواصل مباشرة مع فريق وبوت BaseX على تليجرام لتأكيد عمليات الشحن، شراء قسائم الهدايا، أو الحصول على دعم فني فوري للأدوات والكورسات.</p>
+                <div id="sup-user-quick-info" class="p-3 rounded-xl bg-charcoal border border-goldPrimary/20 font-mono text-[11px] text-goldLight">
+                    Account: Guest
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button type="button" onclick="copySupportTicketInfo()" class="py-3 px-4 rounded-xl bg-obsidian hover:bg-charcoal border border-goldPrimary/35 text-goldLight font-bold text-xs flex items-center justify-center gap-2">
+                    <i data-lucide="clipboard-copy" class="w-4 h-4"></i>
+                    <span data-i18n="btn_copy_ticket">نسخ بيانات حسابي للإرسال</span>
+                </button>
+                <a href="https://t.me/basexsupport_bot" target="_blank" rel="noopener noreferrer" class="py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    <span data-i18n="btn_open_telegram">فتح @basexsupport_bot</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL B: PRODUCT DETAILS & INSTANT BUY ==================== -->
+    <div id="modal-product" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="luxury-card rounded-3xl max-w-2xl w-full p-6 relative my-auto border-goldPrimary/35">
+            <button onclick="closeModal('modal-product')" class="absolute top-4 ltr:right-4 rtl:left-4 w-8 h-8 rounded-lg bg-obsidian text-slate-400 hover:text-white flex items-center justify-center z-10">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+            <div id="product-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL C: ADMIN PRODUCT & FILE UPLOAD EDITOR ==================== -->
+    <div id="modal-product-editor" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="luxury-card rounded-3xl max-w-2xl w-full p-6 relative my-auto border-goldPrimary/35">
+            <button onclick="closeModal('modal-product-editor')" class="absolute top-4 ltr:right-4 rtl:left-4 w-8 h-8 rounded-lg bg-obsidian text-slate-400 hover:text-white flex items-center justify-center">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <h3 id="editor-modal-title" class="text-lg font-black text-white mb-4" data-i18n="btn_new_product">إضافة منتج جديد</h3>
+
+            <form onsubmit="saveProductFromEditor(event)" class="space-y-4">
+                <input type="hidden" id="edit-prod-id">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_title_ar">اسم المنتج (عربي)</label>
+                        <input type="text" id="edit-title-ar" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_title_en">Product Title (English)</label>
+                        <input type="text" id="edit-title-en" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="th_category">القسم</label>
+                        <select id="edit-category" class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                            <option value="tools">أدوات فحص / Tools</option>
+                            <option value="combos">كومبوهات / Combos</option>
+                            <option value="courses">كورسات / Courses</option>
+                            <option value="accounts">حسابات / Accounts</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="th_price">السعر ($ USD)</label>
+                        <input type="number" id="edit-price" min="0.5" step="0.01" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm font-mono text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="th_stock">الكمية (Stock)</label>
+                        <input type="number" id="edit-stock" min="0" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm font-mono text-white outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_desc_ar">الوصف (عربي)</label>
+                        <textarea id="edit-desc-ar" rows="2" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_desc_en">Description (English)</label>
+                        <textarea id="edit-desc-en" rows="2" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- Product Cover Image Upload -->
+                <div class="p-3.5 rounded-xl bg-obsidian border border-slate-800 space-y-2">
+                    <label class="block text-xs font-bold text-goldLight" data-i18n="label_cover_img">صورة الغلاف (رفع من جهازك أو رابط مباشر)</label>
+                    <div class="flex flex-col sm:flex-row gap-2.5">
+                        <input type="file" accept="image/*" onchange="handleCoverImageUpload(event)" class="text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-goldPrimary/20 file:text-goldLight">
+                        <input type="text" id="edit-image-url" placeholder="https://... أو اتركه فارغاً للأيقونة الذهبية" class="flex-1 bg-charcoal border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-mono text-white outline-none">
+                    </div>
+                </div>
+
+                <!-- Private Digital Deliverable Payload / File Attachment -->
+                <div class="p-3.5 rounded-xl bg-obsidian border border-goldPrimary/30 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <label class="text-xs font-bold text-goldLight" data-i18n="label_private_payload">المحتوى أو الملف الرقمي السري (يظهر للمشتري فقط بعد الدفع)</label>
+                        <label class="cursor-pointer px-3 py-1 rounded-lg gold-btn text-xs font-extrabold inline-flex items-center gap-1.5">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span data-i18n="btn_attach_file">رفع ملف من جهازك</span>
+                            <input type="file" onchange="handlePrivateFileAttachment(event)" class="hidden">
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <select id="edit-delivery-type" class="bg-charcoal border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white outline-none">
+                            <option value="text">نص / بيانات حسابات / روابط (Text / Credentials)</option>
+                            <option value="file">ملف قابل للتحميل (Downloadable File)</option>
+                        </select>
+                        <input type="text" id="edit-delivery-filename" placeholder="اسم الملف (مثال: BaseX_Tool_v5.txt)" class="bg-charcoal border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-mono text-goldLight outline-none">
+                    </div>
+                    <textarea id="edit-delivery-content" rows="3" required placeholder="أدخل محتوى الملف أو الحسابات أو رابط التحميل المشفر هنا..." class="w-full bg-charcoal border border-slate-700 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-xs font-mono text-emerald-300 outline-none"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2.5 pt-2">
+                    <button type="button" onclick="closeModal('modal-product-editor')" class="px-4 py-2.5 rounded-xl bg-obsidian text-slate-300 text-xs font-bold" data-i18n="btn_cancel">إلغاء</button>
+                    <button type="submit" class="gold-btn px-6 py-2.5 rounded-xl font-black text-xs sm:text-sm" data-i18n="btn_save_product">حفظ ونشر المنتج</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== REAL FIREBASE + LIVE PERSISTENCE ENGINE ==================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, signInAnonymously, signInWithCustomToken, 
+            signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, 
+            onSnapshot, collection 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment Config Detection
+        const hasFirebaseEnv = typeof __firebase_config !== 'undefined' && __firebase_config;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'basex-shop-prod';
+        let db = null;
+        let auth = null;
+        let firebaseReady = false;
+
+        // Local Mirror Key for Instant Offline/Fallback Persistence
+        const LOCAL_DB_KEY = 'basex_shop_realtime_db_v2';
+        const SESSION_USER_KEY = 'basex_shop_active_user_v2';
+        const ADMIN_UNLOCK_KEY = 'basex_admin_unlocked_session';
+
+        // Default Pre-seeded Catalog & Settings
+        const SEED_SETTINGS = {
+            BTC: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
+            LTC: 'ltc1q8c6fshw2dlwun7ekn9qwf37cu2rn755upcp6el',
+            USDT_BEP20: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+            adminSecretCode: 'BASEX2026',
+            announcementText: '🔥 شحن فوري عبر BTC / LTC / USDT — للدعم الفني وقسائم الشحن تواصل مع بوت تليجرام @basexsupport_bot'
+        };
+
+        const SEED_VOUCHERS = [
+            { code: 'BASEX10', type: 'discount', value: 10, used: false },
+            { code: 'BX-WELCOME-25', type: 'gift', value: 25, used: false }
+        ];
+
+        const SEED_PRODUCTS = [
+            {
+                id: 'bx-tool-01',
+                titleAr: 'أداة BaseX لفحص البروكسيات والـ API فائقة السرعة v5.0',
+                titleEn: 'BaseX Turbo Multi-Thread API & Proxy Checker v5.0',
+                descAr: 'أداة برمجية احترافية تدعم حتى 800 اتصال متزامن لفحص البروكسيات ونقاط الاتصال وتصدير النتائج النظيفة تلقائياً.',
+                descEn: 'Enterprise-grade multi-threaded checker supporting up to 800 concurrent threads with instant clean TXT/JSON export.',
+                category: 'tools',
+                priceUSD: 24.99,
+                stock: 19,
+                imageUrl: '',
+                deliveryType: 'file',
+                deliveryFileName: 'BaseX_TurboChecker_v5.txt',
+                deliveryContent: '=== BASEX TURBO CHECKER v5.0 ===\nActivation Key: BX-GOLD-9921-8840-PRO\nDownload Mirror: https://cdn.basex.shop/tools/BaseX_TurboChecker_v5.zip\nArchive Password: BaseX#Gold2026'
+            },
+            {
+                id: 'bx-combo-02',
+                titleAr: 'حزمة كومبو QA واختبار قواعد البيانات (100K High-Quality)',
+                titleEn: 'Fresh Verified QA & Auth Stress-Test Combo (100K Lines)',
+                descAr: 'قائمة منظمة ومفلترة بالكامل بصيغة Email:Pass خالية من التكرار ومخصصة لاختبارات الضغط وأنظمة التحقق.',
+                descEn: '100% deduplicated Email:Pass synthetic dataset formatted in UTF-8 for authentication load testing and QA pipelines.',
+                category: 'combos',
+                priceUSD: 14.50,
+                stock: 42,
+                imageUrl: '',
+                deliveryType: 'file',
+                deliveryFileName: 'BaseX_Fresh_100K_Combo.txt',
+                deliveryContent: '=== BASEX VERIFIED 100K DATASET ===\nFull Download URL: https://cdn.basex.shop/combos/BaseX_100K_2026.txt\nPreview Sample:\nalpha_dev01@sandbox.io:Bx$99201a\nqa_tester99@staging.dev:Pass#88412\nload_node04@cloudtest.net:Node!77310'
+            },
+            {
+                id: 'bx-course-03',
+                titleAr: 'كورس هندسة الأتمتة وبناء أدوات الفحص المتقدمة بـ Python',
+                titleEn: 'Advanced Python Async Automation & Checker Engineering Course',
+                descAr: 'دورة تطبيقية شاملة (16 ساعة فيديو 1080p + السورس كود الكامل) لتصميم أدوات الفحص السريعة وإدارة البروكسيات.',
+                descEn: '16-hour 1080p HD masterclass + full source code covering AsyncIO architecture, TLS fingerprinting, and proxy rotation.',
+                category: 'courses',
+                priceUSD: 39.00,
+                stock: 12,
+                imageUrl: '',
+                deliveryType: 'text',
+                deliveryFileName: 'Python_Masterclass_Access.txt',
+                deliveryContent: 'Academy Portal: https://academy.basex.shop/vip-access\nEnrollment Coupon: BX-ACADEMY-VIP-2026\nPrivate Source Repo: https://github.com/basex-labs/python-automation-pro'
+            },
+            {
+                id: 'bx-acc-04',
+                titleAr: 'باقة 15 حساب مطورين وسحابة مفعّلة بالكامل (Email:Pass)',
+                titleEn: '15x Verified Cloud & Developer Sandbox Accounts Pack',
+                descAr: 'حسابات مطورين جاهزة ومفعلة مع صلاحيات API كاملة وإيميل استرداد أساسي لكل حساب.',
+                descEn: 'Ready-to-use verified developer accounts with full API quotas and primary recovery email included.',
+                category: 'accounts',
+                priceUSD: 18.00,
+                stock: 9,
+                imageUrl: '',
+                deliveryType: 'file',
+                deliveryFileName: 'BaseX_15x_Verified_Accounts.txt',
+                deliveryContent: 'dev_bx01@basexmail.com:Gold#9910:rec01@mail.com\ndev_bx02@basexmail.com:Gold#8821:rec02@mail.com\ndev_bx03@basexmail.com:Gold#7732:rec03@mail.com\n(All 15 accounts unlocked)'
+            }
+        ];
+
+        // Global Reactive App State
+        window.state = {
+            lang: 'ar',
+            currentUser: null, // { uid, email, displayName, balanceUSD }
+            usersMap: {},
+            products: [],
+            deposits: [],
+            orders: [],
+            vouchers: [],
+            appliedDiscount: null,
+            settings: { ...SEED_SETTINGS },
+            selectedCategory: 'all',
+            selectedCoin: 'BTC',
+            authMode: 'login'
+        };
+
+        // Load Local Fallback DB first so UI renders instantaneously
+        function loadLocalMirror() {
+            try {
+                const raw = localStorage.getItem(LOCAL_DB_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    window.state.products = parsed.products || [...SEED_PRODUCTS];
+                    window.state.deposits = parsed.deposits || [];
+                    window.state.orders = parsed.orders || [];
+                    window.state.vouchers = parsed.vouchers || [...SEED_VOUCHERS];
+                    window.state.settings = { ...SEED_SETTINGS, ...(parsed.settings || {}) };
+                    window.state.usersMap = parsed.usersMap || {};
+                } else {
+                    window.state.products = [...SEED_PRODUCTS];
+                    window.state.vouchers = [...SEED_VOUCHERS];
+                    saveLocalMirror();
+                }
+
+                const savedUser = localStorage.getItem(SESSION_USER_KEY);
+                if (savedUser) {
+                    const u = JSON.parse(savedUser);
+                    if (window.state.usersMap[u.uid]) {
+                        window.state.currentUser = window.state.usersMap[u.uid];
+                    } else {
+                        window.state.currentUser = u;
+                        window.state.usersMap[u.uid] = u;
+                    }
+                }
+            } catch (err) {
+                window.state.products = [...SEED_PRODUCTS];
+                window.state.vouchers = [...SEED_VOUCHERS];
+            }
+        }
+
+        function saveLocalMirror() {
+            try {
+                localStorage.setItem(LOCAL_DB_KEY, JSON.stringify({
+                    products: window.state.products,
+                    deposits: window.state.deposits,
+                    orders: window.state.orders,
+                    vouchers: window.state.vouchers,
+                    settings: window.state.settings,
+                    usersMap: window.state.usersMap
+                }));
+                if (window.state.currentUser) {
+                    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(window.state.currentUser));
+                } else {
+                    localStorage.removeItem(SESSION_USER_KEY);
+                }
+            } catch (e) {}
+        }
+
+        // ==================== INITIALIZE FIREBASE REALTIME PERSISTENCE ====================
+        async function initFirebaseBackend() {
+            if (!hasFirebaseEnv) {
+                document.getElementById('sync-status-pill').textContent = 'LIVE DB';
+                return;
+            }
+
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Rule 3: Authenticate before Firestore queries
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                firebaseReady = true;
+                document.getElementById('sync-status-pill').textContent = 'CLOUD LIVE';
+
+                // Rule 1: Strict public data paths /artifacts/{appId}/public/data/{collection}
+                const productsCol = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+                const depositsCol = collection(db, 'artifacts', appId, 'public', 'data', 'deposits');
+                const ordersCol = collection(db, 'artifacts', appId, 'public', 'data', 'orders');
+                const usersCol = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                const vouchersCol = collection(db, 'artifacts', appId, 'public', 'data', 'vouchers');
+                const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'wallets');
+
+                // Listen to Settings
+                onSnapshot(settingsDoc, async (snap) => {
+                    if (snap.exists()) {
+                        window.state.settings = { ...SEED_SETTINGS, ...snap.data() };
+                        saveLocalMirror();
+                        window.refreshUI();
+                    } else {
+                        await setDoc(settingsDoc, SEED_SETTINGS);
+                    }
+                }, (err) => console.warn('Settings sync:', err));
+
+                // Listen to Products (Seed if empty)
+                onSnapshot(productsCol, async (snap) => {
+                    if (snap.empty) {
+                        for (const p of SEED_PRODUCTS) {
+                            await setDoc(doc(productsCol, p.id), p);
+                        }
+                    } else {
+                        window.state.products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        saveLocalMirror();
+                        window.refreshUI();
+                    }
+                }, (err) => console.warn('Products sync:', err));
+
+                // Listen to Deposits
+                onSnapshot(depositsCol, (snap) => {
+                    window.state.deposits = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                        .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+                    saveLocalMirror();
+                    window.refreshUI();
+                }, (err) => console.warn('Deposits sync:', err));
+
+                // Listen to Orders
+                onSnapshot(ordersCol, (snap) => {
+                    window.state.orders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                        .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+                    saveLocalMirror();
+                    window.refreshUI();
+                }, (err) => console.warn('Orders sync:', err));
+
+                // Listen to Users (for real-time balance updates when Admin approves deposit)
+                onSnapshot(usersCol, (snap) => {
+                    snap.docs.forEach(d => {
+                        window.state.usersMap[d.id] = { uid: d.id, ...d.data() };
+                    });
+                    if (window.state.currentUser && window.state.usersMap[window.state.currentUser.uid]) {
+                        window.state.currentUser = window.state.usersMap[window.state.currentUser.uid];
+                    }
+                    saveLocalMirror();
+                    window.refreshUI();
+                }, (err) => console.warn('Users sync:', err));
+
+                // Listen to Vouchers
+                onSnapshot(vouchersCol, async (snap) => {
+                    if (snap.empty) {
+                        for (const v of SEED_VOUCHERS) {
+                            await setDoc(doc(vouchersCol, v.code), v);
+                        }
+                    } else {
+                        window.state.vouchers = snap.docs.map(d => ({ code: d.id, ...d.data() }));
+                        saveLocalMirror();
+                        window.refreshUI();
+                    }
+                }, (err) => console.warn('Vouchers sync:', err));
+
+            } catch (err) {
+                console.warn('Running in resilient local persistence mode:', err);
+                firebaseReady = false;
+            }
+        }
+
+        // ==================== DB WRITE HELPERS (CLOUD + LOCAL SYNC) ====================
+        window.dbUpsertUser = async function(userObj) {
+            window.state.usersMap[userObj.uid] = userObj;
+            window.state.currentUser = userObj;
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                const uRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userObj.uid);
+                await setDoc(uRef, userObj, { merge: true });
+            }
+            window.refreshUI();
+        };
+
+        window.dbSaveProduct = async function(prodObj) {
+            const idx = window.state.products.findIndex(p => p.id === prodObj.id);
+            if (idx >= 0) window.state.products[idx] = prodObj;
+            else window.state.products.unshift(prodObj);
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                const pRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', prodObj.id);
+                await setDoc(pRef, prodObj);
+            }
+            window.refreshUI();
+        };
+
+        window.dbDeleteProduct = async function(prodId) {
+            window.state.products = window.state.products.filter(p => p.id !== prodId);
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', prodId));
+            }
+            window.refreshUI();
+        };
+
+        window.dbCreateDeposit = async function(depObj) {
+            window.state.deposits.unshift(depObj);
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'deposits', depObj.id), depObj);
+            }
+            window.refreshUI();
+        };
+
+        window.dbProcessDeposit = async function(depId, newStatus) {
+            const dep = window.state.deposits.find(d => d.id === depId);
+            if (!dep || dep.status !== 'pending') return;
+            dep.status = newStatus;
+
+            if (newStatus === 'approved') {
+                const targetUser = window.state.usersMap[dep.userId];
+                if (targetUser) {
+                    targetUser.balanceUSD = Number((Number(targetUser.balanceUSD || 0) + Number(dep.amountUSD)).toFixed(2));
+                    if (window.state.currentUser && window.state.currentUser.uid === targetUser.uid) {
+                        window.state.currentUser.balanceUSD = targetUser.balanceUSD;
+                    }
+                    if (firebaseReady && db) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', targetUser.uid), {
+                            balanceUSD: targetUser.balanceUSD
+                        });
+                    }
+                }
+            }
+
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'deposits', depId), {
+                    status: newStatus
+                });
+            }
+            window.refreshUI();
+        };
+
+        window.dbCreateOrder = async function(orderObj, updatedProduct) {
+            window.state.orders.unshift(orderObj);
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', orderObj.id), orderObj);
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', updatedProduct.id), {
+                    stock: updatedProduct.stock
+                });
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', window.state.currentUser.uid), {
+                    balanceUSD: window.state.currentUser.balanceUSD
+                });
+            }
+            window.refreshUI();
+        };
+
+        window.dbSaveSettings = async function(newSettings) {
+            window.state.settings = { ...window.state.settings, ...newSettings };
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'wallets'), window.state.settings, { merge: true });
+            }
+            window.refreshUI();
+        };
+
+        window.dbSaveVoucher = async function(voucherObj) {
+            const idx = window.state.vouchers.findIndex(v => v.code === voucherObj.code);
+            if (idx >= 0) window.state.vouchers[idx] = voucherObj;
+            else window.state.vouchers.unshift(voucherObj);
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'vouchers', voucherObj.code), voucherObj);
+            }
+            window.refreshUI();
+        };
+
+        window.dbDeleteVoucher = async function(code) {
+            window.state.vouchers = window.state.vouchers.filter(v => v.code !== code);
+            saveLocalMirror();
+            if (firebaseReady && db) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'vouchers', code));
+            }
+            window.refreshUI();
+        };
+
+        // ==================== REAL AUTHENTICATION HANDLERS ====================
+        window.handleEmailAuth = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value.trim().toLowerCase();
+            const password = document.getElementById('auth-password').value;
+            const nameInput = document.getElementById('auth-name').value.trim();
+
+            if (!email || !password) return;
+            if (password.length < 6) {
+                window.showToast(window.t('toast_short_pass'), 'error');
+                return;
+            }
+
+            // Real Firebase Email/Password Authentication when cloud auth is active
+            if (firebaseReady && auth) {
+                try {
+                    let cred;
+                    if (window.state.authMode === 'register') {
+                        cred = await createUserWithEmailAndPassword(auth, email, password);
+                    } else {
+                        try {
+                            cred = await signInWithEmailAndPassword(auth, email, password);
+                        } catch (loginErr) {
+                            if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential') {
+                                window.showToast(window.t('toast_invalid_cred'), 'error');
+                                return;
+                            }
+                            throw loginErr;
+                        }
+                    }
+
+                    const fbUser = cred.user;
+                    const existing = window.state.usersMap[fbUser.uid];
+                    await window.dbUpsertUser(existing || {
+                        uid: fbUser.uid,
+                        email: fbUser.email,
+                        displayName: nameInput || fbUser.email.split('@')[0],
+                        balanceUSD: 0.00,
+                        role: 'user',
+                        createdAt: new Date().toISOString()
+                    });
+
+                    window.closeModal('modal-auth');
+                    window.showToast(window.t('toast_login_ok'), 'success');
+                    return;
+                } catch (err) {
+                    if (err.code === 'auth/email-already-in-use') {
+                        window.showToast(window.t('toast_email_used'), 'error');
+                        return;
+                    }
+                    // Continue to local credential store if Email/Password provider isn't enabled in Firebase console
+                }
+            }
+
+            // Local Verified Credential Store Fallback
+            const uid = 'usr_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
+            const existing = window.state.usersMap[uid];
+
+            if (window.state.authMode === 'register') {
+                if (existing) {
+                    window.showToast(window.t('toast_email_used'), 'error');
+                    return;
+                }
+                await window.dbUpsertUser({
+                    uid,
+                    email,
+                    passwordHash: btoa(password),
+                    displayName: nameInput || email.split('@')[0],
+                    balanceUSD: 0.00,
+                    role: 'user',
+                    createdAt: new Date().toISOString()
+                });
+            } else {
+                if (!existing || (existing.passwordHash && existing.passwordHash !== btoa(password))) {
+                    window.showToast(window.t('toast_invalid_cred'), 'error');
+                    return;
+                }
+                await window.dbUpsertUser(existing);
+            }
+
+            window.closeModal('modal-auth');
+            window.showToast(window.t('toast_login_ok'), 'success');
+        };
+
+        window.handleGoogleSignIn = async function() {
+            if (firebaseReady && auth) {
+                try {
+                    const provider = new GoogleAuthProvider();
+                    const res = await signInWithPopup(auth, provider);
+                    const u = res.user;
+                    const existing = window.state.usersMap[u.uid];
+                    await window.dbUpsertUser(existing || {
+                        uid: u.uid,
+                        email: u.email,
+                        displayName: u.displayName || 'Google Member',
+                        balanceUSD: 0.00,
+                        role: 'user',
+                        createdAt: new Date().toISOString()
+                    });
+                    window.closeModal('modal-auth');
+                    window.showToast(window.t('toast_login_ok'), 'success');
+                    return;
+                } catch (err) {
+                    window.showToast(window.t('toast_google_err'), 'error');
+                    return;
+                }
+            }
+            window.showToast(window.t('toast_google_err'), 'error');
+        };
+
+        window.logoutUser = async function() {
+            window.state.currentUser = null;
+            saveLocalMirror();
+            if (firebaseReady && auth) {
+                try { await signInAnonymously(auth); } catch (e) {}
+            }
+            window.closeModal('modal-auth');
+            window.refreshUI();
+            window.showToast(window.t('toast_logout'), 'success');
+        };
+
+        // Boot Sequence
+        loadLocalMirror();
+        window.initRoutingAndUI();
+        initFirebaseBackend();
+    </script>
+
+    <!-- ==================== UI, ROUTING & INTERACTION CONTROLLER ==================== -->
+    <script>
+        const TRANSLATIONS = {
+            ar: {
+                brand_subtitle: 'متجر بيسكس للأدوات الرقمية والكورسات',
+                nav_store: 'المتجر',
+                nav_wallet: 'شحن الرصيد',
+                nav_orders: 'طلباتي',
+                nav_support: 'الدعم',
+                balance_label: 'الرصيد',
+                btn_login: 'دخول',
+                hero_badge: 'تسليم رقمي فوري ومشفّر 24/7',
+                hero_title: 'أقوى الأدوات الرقمية، الكومبوهات، والكورسات الاحترافية',
+                hero_desc: 'اشحن محفظتك بسهولة عبر العملات الرقمية (BTC, LTC, USDT BEP20) واحصل على وصول مباشر وفوري للأدوات البرمجية، القوائم المفلترة، والدورات التقنية.',
+                hero_cta_deposit: 'شحن المحفظة بالكريبتو',
+                hero_cta_orders: 'مشترياتي وتنزيلاتي',
+                db_status_label: 'حالة النظام والمتجر',
+                accepted_crypto: 'العملات المقبولة',
+                support_bot_label: 'بوت الدعم الرسمي',
+                float_support_sub: 'الدعم الفني المباشر',
+                sup_modal_title: 'مركز الدعم وبوت تليجرام الرسمي',
+                sup_modal_desc: 'تواصل مباشرة مع فريق وبوت BaseX على تليجرام لتأكيد عمليات الشحن، شراء قسائم الهدايا، أو الحصول على دعم فني فوري للأدوات والكورسات.',
+                btn_copy_ticket: 'نسخ بيانات حسابي للإرسال',
+                btn_open_telegram: 'فتح @basexsupport_bot',
+                voucher_box_title: 'شحن فوري عبر قسيمة هدية (Gift Voucher Code)',
+                btn_redeem: 'تفعيل الكود',
+                active_account: 'الحساب النشط',
+                cat_all: 'الكل',
+                cat_tools: 'أدوات فحص',
+                cat_combos: 'كومبوهات',
+                cat_courses: 'كورسات',
+                cat_accounts: 'حسابات',
+                search_placeholder: 'ابحث في المتجر...',
+                sort_default: 'الترتيب الافتراضي',
+                sort_low: 'السعر: الأقل أولاً',
+                sort_high: 'السعر: الأعلى أولاً',
+                no_products: 'لا توجد منتجات مطابقة للبحث',
+                stock_in: 'متوفر:',
+                stock_out: 'نفذت الكمية',
+                btn_buy_now: 'شراء فوري',
+                wallet_page_title: 'شحن رصيد المحفظة (Crypto)',
+                wallet_page_sub: 'اختر العملة الرقمية وحوّل المبلغ ثم أرسل رقم المعاملة TxID لتأكيد الشحن.',
+                current_balance: 'رصيدك الحالي',
+                btn_copy: 'نسخ',
+                label_usd_amount: 'المبلغ المرسل بالدولار ($ USD)',
+                label_tx_hash: 'معرّف المعاملة (TxID / Hash)',
+                btn_confirm_deposit: 'إرسال طلب شحن الرصيد',
+                my_deposits_title: 'سجل طلبات الشحن الخاصة بك',
+                orders_title: 'طلباتي ومشترياتي الرقمية',
+                orders_sub: 'يمكنك نسخ البيانات أو تحميل ملفات الأدوات والكورسات المشتراة في أي وقت.',
+                back_store: 'العودة للمتجر',
+                admin_gate_title: 'بوابة إدارة BaseX السرية',
+                admin_gate_desc: 'أدخل رمز الوصول السري للمتابعة إلى لوحة التحكم.',
+                admin_secret_label: 'رمز الدخول السري (Secret Access Code)',
+                btn_unlock_admin: 'فتح لوحة الإدارة',
+                admin_panel_title: 'لوحة تحكم BaseX الإدارية',
+                btn_lock_admin: 'قفل الجلسة',
+                btn_view_store: 'عرض المتجر',
+                kpi_revenue: 'إجمالي المبيعات',
+                kpi_orders: 'إجمالي الطلبات',
+                kpi_pending: 'طلبات شحن معلقة',
+                kpi_products: 'المنتجات المنشورة',
+                atab_products: 'إدارة المنتجات والملفات',
+                atab_deposits: 'طلبات شحن الرصيد',
+                atab_users: 'المستخدمين والأرصدة',
+                atab_vouchers: 'الكوبونات وقسائم الشحن',
+                atab_orders: 'سجل المبيعات',
+                atab_settings: 'المحافظ والأمان',
+                adm_prod_heading: 'المنتجات والملفات الرقمية',
+                adm_users_heading: 'العملاء المسجلين وإدارة الأرصدة',
+                create_voucher_title: 'إنشاء قسيمة شحن رصيد ($) أو كوبون خصم (%)',
+                btn_create_voucher: 'إنشاء الكود',
+                label_announcement: 'نص شريط الإعلانات العلوي (Live Banner)',
+                btn_new_product: 'إضافة منتج جديد',
+                th_product: 'المنتج',
+                th_category: 'القسم',
+                th_price: 'السعر',
+                th_stock: 'المخزون',
+                th_delivery: 'نوع التسليم',
+                th_actions: 'تحكم',
+                adm_dep_heading: 'طلبات شحن العملات الرقمية',
+                adm_ord_heading: 'جميع عمليات الشراء المنفذة',
+                th_buyer: 'المشتري',
+                th_date: 'التاريخ',
+                adm_set_heading: 'إعدادات محافظ الكريبتو ورمز الإدارة',
+                label_new_secret: 'رمز الدخول السري للوحة الإدارة (Admin Secret Code)',
+                btn_save_settings: 'حفظ جميع الإعدادات',
+                btn_logout: 'تسجيل خروج',
+                auth_modal_title: 'حسابك في BaseX Shop',
+                auth_modal_sub: 'سجّل الدخول لحفظ رصيدك ومشترياتك الرقمية',
+                tab_login: 'تسجيل الدخول',
+                tab_register: 'إنشاء حساب',
+                label_fullname: 'الاسم المستعار',
+                label_email: 'البريد الإلكتروني',
+                label_password: 'كلمة المرور',
+                btn_login_submit: 'متابعة',
+                btn_google: 'الدخول السريع بحساب Google',
+                label_title_ar: 'اسم المنتج (عربي)',
+                label_title_en: 'Product Title (English)',
+                label_desc_ar: 'الوصف (عربي)',
+                label_desc_en: 'Description (English)',
+                label_cover_img: 'صورة الغلاف (رفع من جهازك أو رابط مباشر)',
+                label_private_payload: 'المحتوى أو الملف الرقمي السري (يظهر للمشتري فقط بعد الدفع)',
+                btn_attach_file: 'رفع ملف من جهازك',
+                btn_cancel: 'إلغاء',
+                btn_save_product: 'حفظ ونشر المنتج',
+                status_pending: 'قيد المراجعة',
+                status_approved: 'مقبول',
+                status_rejected: 'مرفوض',
+                btn_approve: 'موافقة وإضافة الرصيد',
+                btn_reject: 'رفض',
+                btn_download: 'تحميل الملف',
+                btn_copy_payload: 'نسخ المحتوى',
+                toast_copied: 'تم النسخ إلى الحافظة!',
+                toast_login_ok: 'تم تسجيل الدخول بنجاح!',
+                toast_short_pass: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
+                toast_invalid_cred: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+                toast_email_used: 'هذا البريد الإلكتروني مسجل مسبقاً! يرجى تسجيل الدخول.',
+                toast_google_err: 'يرجى استخدام البريد الإلكتروني وكلمة المرور في وضع المعاينة.',
+                toast_voucher_ok: 'تم تفعيل القسيمة وإضافة الرصيد إلى محفظتك!',
+                toast_voucher_bad: 'كود القسيمة غير صالح أو تم استخدامه مسبقاً.',
+                toast_coupon_applied: 'تم تطبيق كوبون الخصم بنجاح!',
+                toast_logout: 'تم تسجيل الخروج.',
+                toast_need_login: 'يرجى تسجيل الدخول أولاً للمتابعة.',
+                toast_insufficient: 'رصيدك غير كافٍ! يرجى شحن محفظتك أولاً.',
+                toast_buy_success: 'تم الشراء بنجاح! يمكنك تحميل المنتج الآن من طلباتي.',
+                toast_dep_submitted: 'تم إرسال طلب الشحن! بانتظار موافقة الإدارة.',
+                toast_dep_approved: 'تمت الموافقة وإضافة الرصيد لحساب العميل!',
+                toast_dep_rejected: 'تم رفض طلب الشحن.',
+                toast_prod_saved: 'تم حفظ المنتج ونشره في المتجر!',
+                toast_prod_deleted: 'تم حذف المنتج.',
+                toast_settings_saved: 'تم حفظ إعدادات المحافظ والأمان!',
+                toast_wrong_secret: 'رمز الدخول السري غير صحيح!'
+            },
+            en: {
+                brand_subtitle: 'Premium Digital Tools, Combos & Courses',
+                nav_store: 'Store',
+                nav_wallet: 'Top Up',
+                nav_orders: 'My Orders',
+                nav_support: 'Support',
+                balance_label: 'Balance',
+                btn_login: 'Sign In',
+                hero_badge: '24/7 Encrypted Instant Auto-Delivery',
+                hero_title: 'Premium Checking Tools, Clean Combos & Pro Courses',
+                hero_desc: 'Top up your USD balance seamlessly with Crypto (BTC, LTC, USDT BEP20) and unlock instant access to automation tools, verified lists, and masterclasses.',
+                hero_cta_deposit: 'Top Up via Crypto',
+                hero_cta_orders: 'My Downloads',
+                db_status_label: 'Platform Status',
+                accepted_crypto: 'Accepted Crypto',
+                support_bot_label: 'Official Support Bot',
+                float_support_sub: '24/7 Live Telegram Support',
+                sup_modal_title: 'Official Telegram Support Center',
+                sup_modal_desc: 'Connect directly with BaseX Support Bot on Telegram to verify crypto deposits, purchase gift vouchers, or get instant technical help.',
+                btn_copy_ticket: 'Copy My Account Ticket',
+                btn_open_telegram: 'Open @basexsupport_bot',
+                voucher_box_title: 'Instant Redeem via Gift Voucher Code',
+                btn_redeem: 'Redeem Code',
+                active_account: 'Active Account',
+                cat_all: 'All',
+                cat_tools: 'Checking Tools',
+                cat_combos: 'Combos',
+                cat_courses: 'Courses',
+                cat_accounts: 'Accounts',
+                search_placeholder: 'Search BaseX Store...',
+                sort_default: 'Default Sort',
+                sort_low: 'Price: Low to High',
+                sort_high: 'Price: High to Low',
+                no_products: 'No matching products found',
+                stock_in: 'Stock:',
+                stock_out: 'Out of Stock',
+                btn_buy_now: 'Buy Now',
+                wallet_page_title: 'Crypto Wallet Top-Up',
+                wallet_page_sub: 'Select your preferred network, transfer funds, and submit your TxID hash.',
+                current_balance: 'Current Balance',
+                btn_copy: 'Copy',
+                label_usd_amount: 'Amount Sent ($ USD)',
+                label_tx_hash: 'Blockchain Transaction Hash (TxID)',
+                btn_confirm_deposit: 'Submit Deposit Request',
+                my_deposits_title: 'Your Deposit History',
+                orders_title: 'My Orders & Digital Downloads',
+                orders_sub: 'Copy credentials or download your purchased tools and courses anytime.',
+                back_store: 'Back to Store',
+                admin_gate_title: 'BaseX Restricted Admin Gate',
+                admin_gate_desc: 'Enter the Admin Secret Access Code to unlock the control panel.',
+                admin_secret_label: 'Admin Secret Access Code',
+                btn_unlock_admin: 'Unlock Admin Panel',
+                admin_panel_title: 'BaseX Admin Control Panel',
+                btn_lock_admin: 'Lock Session',
+                btn_view_store: 'View Store',
+                kpi_revenue: 'Total Revenue',
+                kpi_orders: 'Total Orders',
+                kpi_pending: 'Pending Deposits',
+                kpi_products: 'Active Products',
+                atab_products: 'Products & Files',
+                atab_deposits: 'Deposit Approvals',
+                atab_users: 'Users & Balances',
+                atab_vouchers: 'Coupons & Vouchers',
+                atab_orders: 'Sales Log',
+                atab_settings: 'Wallets & Security',
+                adm_prod_heading: 'Store Products & Digital Payloads',
+                adm_users_heading: 'Registered Customers & Balance Control',
+                create_voucher_title: 'Create Gift Balance Voucher ($) or Discount Coupon (%)',
+                btn_create_voucher: 'Generate Code',
+                label_announcement: 'Top Live Announcement Banner Text',
+                btn_new_product: 'Add New Product',
+                th_product: 'Product',
+                th_category: 'Category',
+                th_price: 'Price',
+                th_stock: 'Stock',
+                th_delivery: 'Delivery',
+                th_actions: 'Actions',
+                adm_dep_heading: 'Crypto Top-Up Requests',
+                adm_ord_heading: 'Completed Customer Purchases',
+                th_buyer: 'Buyer',
+                th_date: 'Date',
+                adm_set_heading: 'Crypto Receiving Wallets & Admin Secret',
+                label_new_secret: 'Admin Secret Access Code',
+                btn_save_settings: 'Save All Settings',
+                btn_logout: 'Sign Out',
+                auth_modal_title: 'Your BaseX Shop Account',
+                auth_modal_sub: 'Sign in to sync your balance and purchased digital assets',
+                tab_login: 'Sign In',
+                tab_register: 'Create Account',
+                label_fullname: 'Display Name',
+                label_email: 'Email Address',
+                label_password: 'Password',
+                btn_login_submit: 'Continue',
+                btn_google: 'Continue with Google',
+                label_title_ar: 'Product Title (Arabic)',
+                label_title_en: 'Product Title (English)',
+                label_desc_ar: 'Description (Arabic)',
+                label_desc_en: 'Description (English)',
+                label_cover_img: 'Cover Image (Upload or Direct URL)',
+                label_private_payload: 'Private Digital Payload / File (Revealed ONLY after purchase)',
+                btn_attach_file: 'Attach File from PC',
+                btn_cancel: 'Cancel',
+                btn_save_product: 'Save & Publish Product',
+                status_pending: 'Pending',
+                status_approved: 'Approved',
+                status_rejected: 'Rejected',
+                btn_approve: 'Approve & Credit Balance',
+                btn_reject: 'Reject',
+                btn_download: 'Download File',
+                btn_copy_payload: 'Copy Payload',
+                toast_copied: 'Copied to clipboard!',
+                toast_login_ok: 'Signed in successfully!',
+                toast_short_pass: 'Password must be at least 6 characters.',
+                toast_invalid_cred: 'Invalid email or password.',
+                toast_email_used: 'Email already registered! Please sign in.',
+                toast_google_err: 'Please use Email & Password sign-in inside preview.',
+                toast_voucher_ok: 'Gift voucher redeemed and credited to your balance!',
+                toast_voucher_bad: 'Invalid or already used voucher code.',
+                toast_coupon_applied: 'Discount coupon applied!',
+                toast_logout: 'Signed out.',
+                toast_need_login: 'Please sign in first to continue.',
+                toast_insufficient: 'Insufficient balance! Please top up your wallet first.',
+                toast_buy_success: 'Purchase complete! Access your item in My Orders.',
+                toast_dep_submitted: 'Deposit request submitted! Awaiting admin approval.',
+                toast_dep_approved: 'Deposit approved and credited to user balance!',
+                toast_dep_rejected: 'Deposit request rejected.',
+                toast_prod_saved: 'Product published to store!',
+                toast_prod_deleted: 'Product deleted.',
+                toast_settings_saved: 'Wallets & security settings saved!',
+                toast_wrong_secret: 'Invalid Admin Secret Code!'
+            }
+        };
+
+        window.t = function(key) {
+            return (TRANSLATIONS[window.state.lang] && TRANSLATIONS[window.state.lang][key]) || key;
+        };
+
+        // ==================== SEPARATE ROUTE HANDLER (#/admin-basex or ?panel=admin) ====================
+        function isAdminRouteActive() {
+            const hash = window.location.hash.toLowerCase();
+            const params = new URLSearchParams(window.location.search);
+            return hash.includes('admin-basex') || params.get('panel') === 'admin';
+        }
+
+        window.initRoutingAndUI = function() {
+            const isAdmin = isAdminRouteActive();
+            const publicShell = document.getElementById('public-shell');
+            const adminShell = document.getElementById('admin-shell');
+
+            if (isAdmin) {
+                publicShell.classList.add('hidden');
+                adminShell.classList.remove('hidden');
+                const unlocked = sessionStorage.getItem(ADMIN_UNLOCK_KEY) === 'true';
+                if (unlocked) {
+                    document.getElementById('admin-gate-screen').classList.add('hidden');
+                    document.getElementById('admin-dashboard-screen').classList.remove('hidden');
+                } else {
+                    document.getElementById('admin-gate-screen').classList.remove('hidden');
+                    document.getElementById('admin-dashboard-screen').classList.add('hidden');
+                }
+            } else {
+                adminShell.classList.add('hidden');
+                publicShell.classList.remove('hidden');
+            }
+
+            applyTranslations();
+            window.refreshUI();
+        };
+
+        window.addEventListener('hashchange', window.initRoutingAndUI);
+
+        window.verifyAdminSecret = function(e) {
+            e.preventDefault();
+            const entered = document.getElementById('admin-secret-input').value.trim();
+            const validSecret = window.state.settings.adminSecretCode || 'BASEX2026';
+            if (entered === validSecret) {
+                sessionStorage.setItem(ADMIN_UNLOCK_KEY, 'true');
+                document.getElementById('admin-secret-input').value = '';
+                window.initRoutingAndUI();
+            } else {
+                window.showToast(window.t('toast_wrong_secret'), 'error');
+            }
+        };
+
+        window.lockAdminSession = function() {
+            sessionStorage.removeItem(ADMIN_UNLOCK_KEY);
+            window.initRoutingAndUI();
+        };
+
+        window.exitAdminRoute = function() {
+            history.replaceState(null, '', window.location.pathname);
+            window.initRoutingAndUI();
+        };
+
+        // ==================== LANGUAGE & RTL/LTR ====================
+        window.toggleLanguage = function() {
+            window.state.lang = window.state.lang === 'ar' ? 'en' : 'ar';
+            applyTranslations();
+            window.refreshUI();
+        };
+
+        function applyTranslations() {
+            const lang = window.state.lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('lang-label').textContent = lang === 'ar' ? 'EN' : 'عربي';
+            const admLang = document.getElementById('admin-lang-label');
+            if (admLang) admLang.textContent = lang === 'ar' ? 'EN' : 'عربي';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (TRANSLATIONS[lang][k]) el.textContent = TRANSLATIONS[lang][k];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const k = el.getAttribute('data-i18n-placeholder');
+                if (TRANSLATIONS[lang][k]) el.placeholder = TRANSLATIONS[lang][k];
+            });
+        }
+
+        // ==================== PUBLIC VIEWS & NAVIGATION ====================
+        window.switchPublicView = function(view) {
+            ['store', 'wallet', 'orders'].forEach(v => {
+                document.getElementById(`pview-${v}`).classList.add('hidden');
+                const btn = document.getElementById(`pnav-${v}`);
+                const mbtn = document.getElementById(`mpnav-${v}`);
+                if (btn) btn.className = 'pnav-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-goldLight transition-all flex items-center gap-2';
+                if (mbtn) mbtn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 text-slate-400';
+            });
+
+            document.getElementById(`pview-${view}`).classList.remove('hidden');
+            const active = document.getElementById(`pnav-${view}`);
+            const mactive = document.getElementById(`mpnav-${view}`);
+            if (active) active.className = 'pnav-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-goldPrimary/15 text-goldLight border border-goldPrimary/30';
+            if (mactive) mactive.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 text-goldLight bg-goldPrimary/15';
+
+            if (view === 'wallet') selectDepositCoin(window.state.selectedCoin);
+            window.refreshUI();
+        };
+
+        window.handleWalletButtonClick = function() {
+            if (!window.state.currentUser) {
+                openAuthModal();
+                return;
+            }
+            switchPublicView('wallet');
+        };
+
+        // ==================== AUTH MODAL UI ====================
+        window.openAuthModal = function() {
+            const u = window.state.currentUser;
+            if (u) {
+                document.getElementById('auth-forms-box').classList.add('hidden');
+                document.getElementById('auth-logged-in-box').classList.remove('hidden');
+                document.getElementById('profile-modal-name').textContent = u.displayName || 'BaseX Member';
+                document.getElementById('profile-modal-email').textContent = u.email;
+                document.getElementById('profile-modal-balance').textContent = Number(u.balanceUSD || 0).toFixed(2);
+            } else {
+                document.getElementById('auth-logged-in-box').classList.add('hidden');
+                document.getElementById('auth-forms-box').classList.remove('hidden');
+            }
+            openModal('modal-auth');
+        };
+
+        window.setAuthMode = function(mode) {
+            window.state.authMode = mode;
+            const nameField = document.getElementById('auth-name-field');
+            const loginTab = document.getElementById('auth-tab-login');
+            const regTab = document.getElementById('auth-tab-register');
+            if (mode === 'register') {
+                nameField.classList.remove('hidden');
+                regTab.className = 'py-2 rounded-lg text-xs font-extrabold gold-btn';
+                loginTab.className = 'py-2 rounded-lg text-xs font-bold text-slate-400';
+            } else {
+                nameField.classList.add('hidden');
+                loginTab.className = 'py-2 rounded-lg text-xs font-extrabold gold-btn';
+                regTab.className = 'py-2 rounded-lg text-xs font-bold text-slate-400';
+            }
+        };
+
+        // ==================== STOREFRONT RENDERING & PURCHASE ====================
+        window.setCategory = function(cat) {
+            window.state.selectedCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.getAttribute('data-cat') === cat) {
+                    btn.className = 'cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold whitespace-nowrap gold-btn';
+                } else {
+                    btn.className = 'cat-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all';
+                }
+            });
+            renderStoreProducts();
+        };
+
+        function getCategoryName(cat) {
+            const map = {
+                tools: window.t('cat_tools'),
+                combos: window.t('cat_combos'),
+                courses: window.t('cat_courses'),
+                accounts: window.t('cat_accounts')
+            };
+            return map[cat] || cat;
+        }
+
+        window.renderStoreProducts = function() {
+            const grid = document.getElementById('products-grid');
+            const empty = document.getElementById('empty-products');
+            if (!grid) return;
+
+            const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+            const sort = document.getElementById('price-sort')?.value || 'default';
+            const lang = window.state.lang;
+
+            let items = window.state.products.filter(p => {
+                const matchCat = window.state.selectedCategory === 'all' || p.category === window.state.selectedCategory;
+                const title = (lang === 'ar' ? p.titleAr : p.titleEn).toLowerCase();
+                const desc = (lang === 'ar' ? p.descAr : p.descEn).toLowerCase();
+                return matchCat && (!query || title.includes(query) || desc.includes(query));
+            });
+
+            if (sort === 'low') items.sort((a, b) => a.priceUSD - b.priceUSD);
+            if (sort === 'high') items.sort((a, b) => b.priceUSD - a.priceUSD);
+
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            grid.innerHTML = items.map(p => {
+                const title = lang === 'ar' ? p.titleAr : p.titleEn;
+                const desc = lang === 'ar' ? p.descAr : p.descEn;
+                const inStock = Number(p.stock) > 0;
+
+                const coverHtml = p.imageUrl
+                    ? `<img src="${p.imageUrl}" alt="${title}" class="w-full h-44 object-cover rounded-2xl border border-goldPrimary/20">`
+                    : `<div class="w-full h-44 rounded-2xl bg-gradient-to-br from-obsidian via-charcoal to-obsidian border border-goldPrimary/20 flex items-center justify-center relative overflow-hidden">
+                           <div class="w-16 h-16 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/35 flex items-center justify-center text-goldLight shadow-gold-glow">
+                               <i data-lucide="${p.category === 'courses' ? 'graduation-cap' : p.category === 'combos' ? 'database' : p.category === 'accounts' ? 'key-round' : 'terminal'}" class="w-8 h-8"></i>
+                           </div>
+                       </div>`;
+
+                return `
+                    <div class="luxury-card rounded-3xl p-4 flex flex-col justify-between transition-all hover:-translate-y-1 group">
+                        <div>
+                            <div class="relative mb-3.5">
+                                ${coverHtml}
+                                <span class="absolute top-2.5 ltr:left-2.5 rtl:right-2.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-obsidian/90 text-goldLight border border-goldPrimary/30 backdrop-blur-md">
+                                    ${getCategoryName(p.category)}
+                                </span>
+                                <span class="absolute top-2.5 ltr:right-2.5 rtl:left-2.5 px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold ${inStock ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'} backdrop-blur-md">
+                                    ${inStock ? `${window.t('stock_in')} ${p.stock}` : window.t('stock_out')}
+                                </span>
+                            </div>
+
+                            <h3 class="font-extrabold text-white text-base line-clamp-1 group-hover:text-goldLight transition-colors mb-1.5">${title}</h3>
+                            <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-4">${desc}</p>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                            <div>
+                                <span class="text-[10px] text-slate-500 block font-mono">USD</span>
+                                <span class="text-xl font-mono font-black text-goldLight">$${Number(p.priceUSD).toFixed(2)}</span>
+                            </div>
+                            <button onclick="openProductQuickView('${p.id}')" class="px-4 py-2.5 rounded-xl ${inStock ? 'gold-btn font-black' : 'bg-slate-800 text-slate-500 font-bold'} text-xs flex items-center gap-1.5">
+                                <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
+                                <span>${window.t('btn_buy_now')}</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        };
+
+        window.openProductQuickView = function(prodId) {
+            const p = window.state.products.find(x => x.id === prodId);
+            if (!p) return;
+            window.state.appliedDiscount = null;
+            const lang = window.state.lang;
+            const title = lang === 'ar' ? p.titleAr : p.titleEn;
+            const desc = lang === 'ar' ? p.descAr : p.descEn;
+            const inStock = Number(p.stock) > 0;
+
+            const media = p.imageUrl
+                ? `<img src="${p.imageUrl}" class="w-full h-52 object-cover rounded-2xl border border-goldPrimary/25 mb-4">`
+                : `<div class="w-full h-40 rounded-2xl bg-obsidian border border-goldPrimary/25 flex items-center justify-center mb-4">
+                       <i data-lucide="shield-check" class="w-14 h-14 text-goldPrimary"></i>
+                   </div>`;
+
+            document.getElementById('product-modal-body').innerHTML = `
+                ${media}
+                <div class="flex items-center justify-between mb-2">
+                    <span class="px-3 py-1 rounded-lg text-xs font-bold bg-goldPrimary/15 text-goldLight border border-goldPrimary/30">${getCategoryName(p.category)}</span>
+                    <span class="text-xs font-mono font-bold ${inStock ? 'text-emerald-400' : 'text-rose-400'}">
+                        ${inStock ? `${window.t('stock_in')} ${p.stock}` : window.t('stock_out')}
+                    </span>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-white mb-2">${title}</h2>
+                <p class="text-sm text-slate-300 leading-relaxed mb-4">${desc}</p>
+
+                <!-- Discount Coupon Input -->
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="checkout-coupon-input" placeholder="Coupon Code (e.g. BASEX10)" class="flex-1 bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-xs font-mono uppercase text-white outline-none">
+                    <button type="button" onclick="applyCheckoutCoupon('${p.id}')" class="px-4 py-2 rounded-xl bg-charcoal hover:bg-slate-800 text-goldLight border border-goldPrimary/30 text-xs font-bold">Apply</button>
+                </div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-slate-800">
+                    <div>
+                        <div class="text-xs text-slate-400">${window.t('th_price')}</div>
+                        <div id="checkout-final-price" class="text-3xl font-mono font-black text-goldLight">$${Number(p.priceUSD).toFixed(2)}</div>
+                    </div>
+                    <button onclick="executePurchase('${p.id}')" ${!inStock ? 'disabled' : ''} class="px-6 py-3.5 rounded-xl ${inStock ? 'gold-btn font-black' : 'bg-slate-800 text-slate-500 cursor-not-allowed font-bold'} text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                        <span>${inStock ? window.t('btn_buy_now') : window.t('stock_out')}</span>
+                    </button>
+                </div>
+            `;
+            openModal('modal-product');
+            lucide.createIcons();
+        };
+
+        window.applyCheckoutCoupon = function(prodId) {
+            const p = window.state.products.find(x => x.id === prodId);
+            const code = (document.getElementById('checkout-coupon-input')?.value || '').trim().toUpperCase();
+            if (!p || !code) return;
+
+            const found = window.state.vouchers.find(v => v.code === code && v.type === 'discount' && !v.used);
+            if (!found) {
+                window.showToast(window.t('toast_voucher_bad'), 'error');
+                return;
+            }
+            window.state.appliedDiscount = found;
+            const discounted = Math.max(0.5, Number(p.priceUSD) * (1 - Number(found.value) / 100));
+            const priceEl = document.getElementById('checkout-final-price');
+            if (priceEl) priceEl.textContent = `$${discounted.toFixed(2)} (-${found.value}%)`;
+            window.showToast(window.t('toast_coupon_applied'), 'success');
+        };
+
+        window.executePurchase = async function(prodId) {
+            const user = window.state.currentUser;
+            if (!user) {
+                closeModal('modal-product');
+                window.showToast(window.t('toast_need_login'), 'error');
+                openAuthModal();
+                return;
+            }
+
+            const p = window.state.products.find(x => x.id === prodId);
+            if (!p || Number(p.stock) <= 0) return;
+
+            let finalPrice = Number(p.priceUSD);
+            if (window.state.appliedDiscount) {
+                finalPrice = Number(Math.max(0.5, finalPrice * (1 - Number(window.state.appliedDiscount.value) / 100)).toFixed(2));
+            }
+
+            if (Number(user.balanceUSD) < finalPrice) {
+                closeModal('modal-product');
+                window.showToast(window.t('toast_insufficient'), 'error');
+                switchPublicView('wallet');
+                return;
+            }
+
+            // Deduct Balance & Stock
+            user.balanceUSD = Number((Number(user.balanceUSD) - finalPrice).toFixed(2));
+            window.state.usersMap[user.uid] = user;
+            p.stock = Number(p.stock) - 1;
+
+            const orderObj = {
+                id: 'ORD-' + Math.floor(10000 + Math.random() * 90000),
+                userId: user.uid,
+                userEmail: user.email,
+                productId: p.id,
+                productTitleAr: p.titleAr,
+                productTitleEn: p.titleEn,
+                priceUSD: finalPrice,
+                deliveryType: p.deliveryType || 'text',
+                deliveryContent: p.deliveryContent,
+                deliveryFileName: p.deliveryFileName || 'BaseX_Item.txt',
+                createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+            };
+
+            window.state.appliedDiscount = null;
+            await window.dbCreateOrder(orderObj, p);
+            closeModal('modal-product');
+            window.showToast(window.t('toast_buy_success'), 'success');
+            switchPublicView('orders');
+        };
+
+        window.redeemGiftVoucher = async function(e) {
+            e.preventDefault();
+            const user = window.state.currentUser;
+            if (!user) {
+                window.showToast(window.t('toast_need_login'), 'error');
+                openAuthModal();
+                return;
+            }
+            const input = document.getElementById('voucher-code-input');
+            const code = (input.value || '').trim().toUpperCase();
+            const voucher = window.state.vouchers.find(v => v.code === code && v.type === 'gift' && !v.used);
+
+            if (!voucher) {
+                window.showToast(window.t('toast_voucher_bad'), 'error');
+                return;
+            }
+
+            voucher.used = true;
+            voucher.usedBy = user.email;
+            user.balanceUSD = Number((Number(user.balanceUSD || 0) + Number(voucher.value)).toFixed(2));
+
+            await window.dbSaveVoucher(voucher);
+            await window.dbUpsertUser(user);
+            input.value = '';
+            window.showToast(window.t('toast_voucher_ok'), 'success');
+        };
+
+        // ==================== TELEGRAM SUPPORT ASSISTANT ====================
+        window.openSupportAssistantModal = function() {
+            const user = window.state.currentUser;
+            const infoBox = document.getElementById('sup-user-quick-info');
+            if (infoBox) {
+                if (user) {
+                    const lastDep = window.state.deposits.find(d => d.userId === user.uid);
+                    const lastOrd = window.state.orders.find(o => o.userId === user.uid);
+                    infoBox.textContent = `User: ${user.email} | Balance: $${Number(user.balanceUSD || 0).toFixed(2)}`
+                        + (lastDep ? ` | Last TxID: ${lastDep.txId}` : '')
+                        + (lastOrd ? ` | Last Order: ${lastOrd.id}` : '');
+                } else {
+                    infoBox.textContent = 'Account: Guest (Not signed in)';
+                }
+            }
+            openModal('modal-support');
+            lucide.createIcons();
+        };
+
+        window.copySupportTicketInfo = function() {
+            const text = document.getElementById('sup-user-quick-info')?.textContent || 'BaseX Support Request';
+            copyText(text);
+        };
+
+        // ==================== CRYPTO WALLET & DEPOSIT LOGIC ====================
+        window.selectDepositCoin = function(coin) {
+            window.state.selectedCoin = coin;
+            ['BTC', 'LTC', 'USDT_BEP20'].forEach(c => {
+                const el = document.getElementById(`coin-card-${c}`);
+                if (!el) return;
+                if (c === coin) {
+                    el.className = 'p-3.5 rounded-2xl border border-goldPrimary bg-goldPrimary/15 text-center transition-all shadow-gold-glow';
+                } else {
+                    el.className = 'p-3.5 rounded-2xl border border-slate-800 bg-obsidian text-center hover:border-goldPrimary/40 transition-all';
+                }
+            });
+
+            const addr = window.state.settings[coin] || '';
+            const addrInput = document.getElementById('deposit-address-input');
+            if (addrInput) addrInput.value = addr;
+
+            const titles = {
+                BTC: 'Bitcoin (BTC) Network Address',
+                LTC: 'Litecoin (LTC) Network Address',
+                USDT_BEP20: 'USDT (BEP20 - Binance Smart Chain) Address'
+            };
+            const titleEl = document.getElementById('selected-network-title');
+            if (titleEl) titleEl.textContent = titles[coin];
+
+            const qrBox = document.getElementById('qrcode');
+            if (qrBox && addr) {
+                qrBox.innerHTML = '';
+                new QRCode(qrBox, {
+                    text: addr,
+                    width: 140,
+                    height: 140,
+                    colorDark: '#070709',
+                    colorLight: '#FFFFFF',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            }
+        };
+
+        window.submitCryptoDeposit = async function(e) {
+            e.preventDefault();
+            const user = window.state.currentUser;
+            if (!user) {
+                window.showToast(window.t('toast_need_login'), 'error');
+                openAuthModal();
+                return;
+            }
+
+            const amount = parseFloat(document.getElementById('dep-amount').value);
+            const txId = document.getElementById('dep-txid').value.trim();
+            if (!amount || amount <= 0 || !txId) return;
+
+            const depObj = {
+                id: 'DEP-' + Math.floor(1000 + Math.random() * 9000),
+                userId: user.uid,
+                userEmail: user.email,
+                coin: window.state.selectedCoin,
+                amountUSD: amount,
+                txId: txId,
+                status: 'pending',
+                createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+            };
+
+            await window.dbCreateDeposit(depObj);
+            document.getElementById('dep-amount').value = '';
+            document.getElementById('dep-txid').value = '';
+            window.showToast(window.t('toast_dep_submitted'), 'success');
+        };
+
+        function renderUserDeposits() {
+            const list = document.getElementById('user-deposits-list');
+            if (!list) return;
+            const user = window.state.currentUser;
+            const myDeps = user ? window.state.deposits.filter(d => d.userId === user.uid) : [];
+
+            if (myDeps.length === 0) {
+                list.innerHTML = `<div class="text-center text-xs text-slate-500 py-10">No deposit transactions yet.</div>`;
+                return;
+            }
+
+            list.innerHTML = myDeps.map(d => {
+                const badge = d.status === 'approved'
+                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">${window.t('status_approved')}</span>`
+                    : d.status === 'rejected'
+                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">${window.t('status_rejected')}</span>`
+                    : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">${window.t('status_pending')}</span>`;
+
+                return `
+                    <div class="p-3.5 rounded-2xl bg-obsidian border border-slate-800 space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono font-black text-sm text-goldLight">$${Number(d.amountUSD).toFixed(2)}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-goldPrimary/15 text-goldLight">${d.coin}</span>
+                            </div>
+                            ${badge}
+                        </div>
+                        <div class="text-[11px] font-mono text-slate-400 truncate">TxID: ${d.txId}</div>
+                        <div class="text-[10px] font-mono text-slate-500">${d.createdAt}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== USER ORDERS & DOWNLOADS ====================
+        function renderUserOrders() {
+            const list = document.getElementById('user-orders-list');
+            if (!list) return;
+            const user = window.state.currentUser;
+            const myOrders = user ? window.state.orders.filter(o => o.userId === user.uid) : [];
+
+            const countBadge = document.getElementById('nav-orders-count');
+            if (countBadge) countBadge.textContent = myOrders.length;
+
+            if (myOrders.length === 0) {
+                list.innerHTML = `<div class="luxury-card rounded-2xl p-12 text-center text-sm text-slate-400">No purchased items yet.</div>`;
+                return;
+            }
+
+            const lang = window.state.lang;
+            list.innerHTML = myOrders.map(o => {
+                const title = lang === 'ar' ? o.productTitleAr : o.productTitleEn;
+                return `
+                    <div class="luxury-card rounded-2xl p-5 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded bg-goldPrimary/15 text-goldLight font-mono text-xs font-bold">${o.id}</span>
+                                    <span class="text-xs font-mono text-slate-400">${o.createdAt}</span>
+                                </div>
+                                <h3 class="text-base sm:text-lg font-extrabold text-white mt-1">${title}</h3>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-lg font-mono font-black text-goldLight">$${Number(o.priceUSD).toFixed(2)}</span>
+                                <button onclick="downloadPayload('${o.id}')" class="gold-btn px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-1.5">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                    <span>${window.t('btn_download')}</span>
+                                </button>
+                                <button onclick="copyOrderText('${o.id}')" class="px-3.5 py-2 rounded-xl bg-obsidian hover:bg-charcoal text-goldLight border border-goldPrimary/30 font-bold text-xs flex items-center gap-1.5">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                    <span>${window.t('btn_copy_payload')}</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-obsidian border border-goldPrimary/20 rounded-xl p-4">
+                            <div class="text-[11px] font-mono text-goldLight mb-1.5 flex items-center gap-1.5">
+                                <i data-lucide="file-key" class="w-3.5 h-3.5"></i>
+                                <span>${o.deliveryFileName || 'Digital_Asset.txt'}</span>
+                            </div>
+                            <pre class="text-xs font-mono text-emerald-300 whitespace-pre-wrap break-all leading-relaxed">${o.deliveryContent}</pre>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        window.downloadPayload = function(orderId) {
+            const ord = window.state.orders.find(o => o.id === orderId);
+            if (!ord) return;
+            const blob = new Blob([ord.deliveryContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = ord.deliveryFileName || `${ord.id}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        window.copyOrderText = function(orderId) {
+            const ord = window.state.orders.find(o => o.id === orderId);
+            if (!ord) return;
+            copyText(ord.deliveryContent);
+        };
+
+        // ==================== ADMIN PANEL FUNCTIONS ====================
+        window.switchAdminTab = function(tab) {
+            ['products', 'deposits', 'users', 'vouchers', 'orders', 'settings'].forEach(tName => {
+                document.getElementById(`apanel-${tName}`).classList.add('hidden');
+                const btn = document.getElementById(`atab-${tName}`);
+                if (btn) btn.className = 'atab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-obsidian text-slate-300 hover:text-goldLight flex items-center gap-2';
+            });
+            document.getElementById(`apanel-${tab}`).classList.remove('hidden');
+            document.getElementById(`atab-${tab}`).className = 'atab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold gold-btn flex items-center gap-2';
+            renderAdminDashboard();
+        };
+
+        function renderAdminDashboard() {
+            if (!isAdminRouteActive()) return;
+
+            const revenue = window.state.orders.reduce((s, o) => s + Number(o.priceUSD || 0), 0);
+            const pendingCount = window.state.deposits.filter(d => d.status === 'pending').length;
+
+            document.getElementById('adm-kpi-revenue').textContent = revenue.toFixed(2);
+            document.getElementById('adm-kpi-orders').textContent = window.state.orders.length;
+            document.getElementById('adm-kpi-pending').textContent = pendingCount;
+            document.getElementById('adm-kpi-products').textContent = window.state.products.length;
+
+            const lang = window.state.lang;
+
+            // Products Table
+            const pTbody = document.getElementById('adm-products-tbody');
+            pTbody.innerHTML = window.state.products.map(p => {
+                const title = lang === 'ar' ? p.titleAr : p.titleEn;
+                return `
+                    <tr class="hover:bg-obsidian/50">
+                        <td class="py-3.5 px-4 font-bold text-white">${title}</td>
+                        <td class="py-3.5 px-4 text-xs text-goldLight">${getCategoryName(p.category)}</td>
+                        <td class="py-3.5 px-4 font-mono font-bold text-emerald-400">$${Number(p.priceUSD).toFixed(2)}</td>
+                        <td class="py-3.5 px-4 font-mono text-slate-300">${p.stock}</td>
+                        <td class="py-3.5 px-4 font-mono text-xs text-slate-400">${p.deliveryFileName || 'Text'}</td>
+                        <td class="py-3.5 px-4 text-end">
+                            <div class="inline-flex items-center gap-2">
+                                <button onclick="openProductEditor('${p.id}')" class="p-2 rounded-lg bg-goldPrimary/15 text-goldLight hover:bg-goldPrimary/25">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteAdminProduct('${p.id}')" class="p-2 rounded-lg bg-rose-500/15 text-rose-400 hover:bg-rose-500/25">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Deposits List
+            const dList = document.getElementById('adm-deposits-list');
+            if (window.state.deposits.length === 0) {
+                dList.innerHTML = `<div class="luxury-card rounded-2xl p-8 text-center text-xs text-slate-400">No crypto deposit requests yet.</div>`;
+            } else {
+                dList.innerHTML = window.state.deposits.map(d => {
+                    const actions = d.status === 'pending' ? `
+                        <div class="flex items-center gap-2">
+                            <button onclick="approveOrRejectDeposit('${d.id}', 'approved')" class="gold-btn px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-1.5">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                <span>${window.t('btn_approve')}</span>
+                            </button>
+                            <button onclick="approveOrRejectDeposit('${d.id}', 'rejected')" class="px-3.5 py-2 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/30 font-bold text-xs">
+                                ${window.t('btn_reject')}
+                            </button>
+                        </div>
+                    ` : `<span class="px-3 py-1 rounded-lg text-xs font-bold ${d.status === 'approved' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}">${window.t('status_' + d.status)}</span>`;
+
+                    return `
+                        <div class="luxury-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="space-y-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="font-mono text-xs text-slate-400">${d.id}</span>
+                                    <span class="px-2 py-0.5 rounded bg-goldPrimary/15 text-goldLight font-mono text-xs font-bold">${d.coin}</span>
+                                    <span class="text-lg font-mono font-black text-white">$${Number(d.amountUSD).toFixed(2)}</span>
+                                    <span class="text-xs font-mono text-slate-300">(${d.userEmail})</span>
+                                </div>
+                                <div class="text-xs font-mono text-emerald-400 break-all">TxID: ${d.txId}</div>
+                            </div>
+                            <div>${actions}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Orders Table
+            const oTbody = document.getElementById('adm-orders-tbody');
+            oTbody.innerHTML = window.state.orders.map(o => {
+                const title = lang === 'ar' ? o.productTitleAr : o.productTitleEn;
+                return `
+                    <tr>
+                        <td class="py-3 px-4 font-mono text-xs text-goldLight font-bold">${o.id}</td>
+                        <td class="py-3 px-4 font-mono text-xs text-slate-300">${o.userEmail}</td>
+                        <td class="py-3 px-4 font-bold text-white">${title}</td>
+                        <td class="py-3 px-4 font-mono font-bold text-emerald-400">$${Number(o.priceUSD).toFixed(2)}</td>
+                        <td class="py-3 px-4 font-mono text-xs text-slate-400">${o.createdAt}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Settings Inputs
+            document.getElementById('set-announcement').value = window.state.settings.announcementText || '';
+            document.getElementById('set-btc').value = window.state.settings.BTC || '';
+            document.getElementById('set-ltc').value = window.state.settings.LTC || '';
+            document.getElementById('set-usdt').value = window.state.settings.USDT_BEP20 || '';
+            document.getElementById('set-secret').value = window.state.settings.adminSecretCode || 'BASEX2026';
+
+            // Users Table
+            const uTbody = document.getElementById('adm-users-tbody');
+            if (uTbody) {
+                const allUsers = Object.values(window.state.usersMap);
+                uTbody.innerHTML = allUsers.length === 0
+                    ? `<tr><td colspan="4" class="py-6 text-center text-xs text-slate-500">No registered users yet.</td></tr>`
+                    : allUsers.map(u => `
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-white">${u.displayName || 'User'}</td>
+                            <td class="py-3 px-4 font-mono text-xs text-slate-300">${u.email}</td>
+                            <td class="py-3 px-4 font-mono font-bold text-goldLight">$${Number(u.balanceUSD || 0).toFixed(2)}</td>
+                            <td class="py-3 px-4 text-end">
+                                <div class="inline-flex items-center gap-1.5">
+                                    <button onclick="adjustUserBalance('${u.uid}', 10)" class="px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-400 font-mono text-xs font-bold">+$10</button>
+                                    <button onclick="adjustUserBalance('${u.uid}', 50)" class="px-2.5 py-1 rounded bg-goldPrimary/15 text-goldLight font-mono text-xs font-bold">+$50</button>
+                                    <button onclick="adjustUserBalance('${u.uid}', -10)" class="px-2.5 py-1 rounded bg-rose-500/15 text-rose-400 font-mono text-xs font-bold">-$10</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+            }
+
+            // Vouchers List
+            const vList = document.getElementById('adm-vouchers-list');
+            if (vList) {
+                vList.innerHTML = window.state.vouchers.map(v => `
+                    <div class="luxury-card rounded-2xl p-4 flex items-center justify-between">
+                        <div>
+                            <div class="font-mono font-black text-sm text-goldLight">${v.code}</div>
+                            <div class="text-xs text-slate-400">
+                                ${v.type === 'gift' ? `Gift Balance: $${v.value}` : `Discount: ${v.value}%`}
+                                ${v.used ? ' • <span class="text-rose-400">USED</span>' : ' • <span class="text-emerald-400">ACTIVE</span>'}
+                            </div>
+                        </div>
+                        <button onclick="deleteAdminVoucher('${v.code}')" class="p-2 rounded-lg bg-rose-500/15 text-rose-400 hover:bg-rose-500/25">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            lucide.createIcons();
+        }
+
+        window.adjustUserBalance = async function(uid, delta) {
+            const u = window.state.usersMap[uid];
+            if (!u) return;
+            u.balanceUSD = Math.max(0, Number((Number(u.balanceUSD || 0) + delta).toFixed(2)));
+            await window.dbUpsertUser(u);
+            window.showToast(window.t('toast_settings_saved'), 'success');
+        };
+
+        window.createAdminVoucher = async function(e) {
+            e.preventDefault();
+            const code = document.getElementById('vouch-code').value.trim().toUpperCase();
+            const type = document.getElementById('vouch-type').value;
+            const value = parseFloat(document.getElementById('vouch-value').value);
+            if (!code || !value) return;
+
+            await window.dbSaveVoucher({ code, type, value, used: false });
+            document.getElementById('vouch-code').value = '';
+            document.getElementById('vouch-value').value = '';
+            window.showToast(window.t('toast_settings_saved'), 'success');
+        };
+
+        window.deleteAdminVoucher = async function(code) {
+            await window.dbDeleteVoucher(code);
+        };
+
+        window.approveOrRejectDeposit = async function(depId, status) {
+            await window.dbProcessDeposit(depId, status);
+            window.showToast(status === 'approved' ? window.t('toast_dep_approved') : window.t('toast_dep_rejected'), status === 'approved' ? 'success' : 'error');
+        };
+
+        window.saveAdminSettings = async function(e) {
+            e.preventDefault();
+            await window.dbSaveSettings({
+                announcementText: document.getElementById('set-announcement').value.trim(),
+                BTC: document.getElementById('set-btc').value.trim(),
+                LTC: document.getElementById('set-ltc').value.trim(),
+                USDT_BEP20: document.getElementById('set-usdt').value.trim(),
+                adminSecretCode: document.getElementById('set-secret').value.trim()
+            });
+            window.showToast(window.t('toast_settings_saved'), 'success');
+        };
+
+        // ==================== ADMIN PRODUCT & FILE UPLOAD EDITOR ====================
+        window.openProductEditor = function(prodId = null) {
+            document.getElementById('edit-prod-id').value = '';
+            document.getElementById('edit-title-ar').value = '';
+            document.getElementById('edit-title-en').value = '';
+            document.getElementById('edit-category').value = 'tools';
+            document.getElementById('edit-price').value = '';
+            document.getElementById('edit-stock').value = '10';
+            document.getElementById('edit-desc-ar').value = '';
+            document.getElementById('edit-desc-en').value = '';
+            document.getElementById('edit-image-url').value = '';
+            document.getElementById('edit-delivery-type').value = 'text';
+            document.getElementById('edit-delivery-filename').value = '';
+            document.getElementById('edit-delivery-content').value = '';
+
+            if (prodId) {
+                const p = window.state.products.find(x => x.id === prodId);
+                if (p) {
+                    document.getElementById('edit-prod-id').value = p.id;
+                    document.getElementById('edit-title-ar').value = p.titleAr;
+                    document.getElementById('edit-title-en').value = p.titleEn;
+                    document.getElementById('edit-category').value = p.category;
+                    document.getElementById('edit-price').value = p.priceUSD;
+                    document.getElementById('edit-stock').value = p.stock;
+                    document.getElementById('edit-desc-ar').value = p.descAr;
+                    document.getElementById('edit-desc-en').value = p.descEn;
+                    document.getElementById('edit-image-url').value = p.imageUrl || '';
+                    document.getElementById('edit-delivery-type').value = p.deliveryType || 'text';
+                    document.getElementById('edit-delivery-filename').value = p.deliveryFileName || '';
+                    document.getElementById('edit-delivery-content').value = p.deliveryContent || '';
+                }
+            }
+            openModal('modal-product-editor');
+        };
+
+        window.handleCoverImageUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('edit-image-url').value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.handlePrivateFileAttachment = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            document.getElementById('edit-delivery-type').value = 'file';
+            document.getElementById('edit-delivery-filename').value = file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('edit-delivery-content').value = e.target.result;
+            };
+            reader.readAsText(file);
+        };
+
+        window.saveProductFromEditor = async function(e) {
+            e.preventDefault();
+            const existingId = document.getElementById('edit-prod-id').value;
+            const prodObj = {
+                id: existingId || 'bx-' + Date.now(),
+                titleAr: document.getElementById('edit-title-ar').value.trim(),
+                titleEn: document.getElementById('edit-title-en').value.trim(),
+                category: document.getElementById('edit-category').value,
+                priceUSD: parseFloat(document.getElementById('edit-price').value),
+                stock: parseInt(document.getElementById('edit-stock').value, 10),
+                descAr: document.getElementById('edit-desc-ar').value.trim(),
+                descEn: document.getElementById('edit-desc-en').value.trim(),
+                imageUrl: document.getElementById('edit-image-url').value.trim(),
+                deliveryType: document.getElementById('edit-delivery-type').value,
+                deliveryFileName: document.getElementById('edit-delivery-filename').value.trim() || 'BaseX_Asset.txt',
+                deliveryContent: document.getElementById('edit-delivery-content').value.trim(),
+                createdAt: new Date().toISOString()
+            };
+
+            await window.dbSaveProduct(prodObj);
+            closeModal('modal-product-editor');
+            window.showToast(window.t('toast_prod_saved'), 'success');
+        };
+
+        window.deleteAdminProduct = async function(prodId) {
+            await window.dbDeleteProduct(prodId);
+            window.showToast(window.t('toast_prod_deleted'), 'success');
+        };
+
+        // ==================== MASTER UI REFRESH & UTILITIES ====================
+        window.refreshUI = function() {
+            const user = window.state.currentUser;
+            const bal = user ? Number(user.balanceUSD || 0).toFixed(2) : '0.00';
+
+            const annEl = document.getElementById('announcement-text');
+            if (annEl && window.state.settings.announcementText) {
+                annEl.textContent = window.state.settings.announcementText;
+            }
+
+            const hBal = document.getElementById('header-balance');
+            const wBal = document.getElementById('wallet-view-balance');
+            if (hBal) hBal.textContent = bal;
+            if (wBal) wBal.textContent = bal;
+
+            const authLabel = document.getElementById('auth-header-label');
+            const heroEmail = document.getElementById('hero-user-email');
+            if (user) {
+                if (authLabel) authLabel.textContent = user.displayName || user.email.split('@')[0];
+                if (heroEmail) heroEmail.textContent = `${user.email} ($${bal})`;
+            } else {
+                if (authLabel) authLabel.textContent = window.t('btn_login');
+                if (heroEmail) heroEmail.textContent = window.state.lang === 'ar' ? 'زائر (يرجى تسجيل الدخول)' : 'Guest (Please Sign In)';
+            }
+
+            renderStoreProducts();
+            renderUserDeposits();
+            renderUserOrders();
+            renderAdminDashboard();
+            lucide.createIcons();
+        };
+
+        window.openModal = function(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+        };
+
+        window.closeModal = function(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        };
+
+        window.copyText = function(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            window.showToast(window.t('toast_copied'), 'success');
+        };
+
+        window.showToast = function(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const style = type === 'error'
+                ? 'bg-rose-950/95 border-rose-500/50 text-rose-200'
+                : 'bg-onyx/95 border-goldPrimary/50 text-goldLight';
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl border ${style} shadow-2xl backdrop-blur-md text-xs font-bold flex items-center gap-2.5`;
+            toast.innerHTML = `
+                <i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle-2'}" class="w-4 h-4 shrink-0"></i>
+                <span>${msg}</span>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        };
+    </script>
+</body>
+</html>

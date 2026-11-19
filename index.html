@@ -1502,10 +1502,6 @@
             window.showToast(window.t('toast_logout'), 'success');
         };
 
-        // Boot Sequence
-        loadLocalMirror();
-        window.initRoutingAndUI();
-        initFirebaseBackend();
     </script>
 
     <!-- ==================== UI, ROUTING & INTERACTION CONTROLLER ==================== -->
@@ -1782,7 +1778,7 @@
         };
 
         // ==================== SEPARATE ROUTE HANDLER (#/admin-basex or ?panel=admin) ====================
-        function isAdminRouteActive() {
+        window.isAdminRouteActive = function isAdminRouteActive() {
             const hash = (window.location.hash || '').toLowerCase().trim();
             const search = (window.location.search || '').toLowerCase();
             const params = new URLSearchParams(search);
@@ -1840,7 +1836,7 @@
         };
 
         window.initRoutingAndUI = function() {
-            const isAdmin = isAdminRouteActive();
+            const isAdmin = window.isAdminRouteActive();
             const publicShell = document.getElementById('public-shell');
             const adminShell = document.getElementById('admin-shell');
             const gateScreen = document.getElementById('admin-gate-screen');
@@ -2456,7 +2452,7 @@
         };
 
         function renderAdminDashboard() {
-            if (!isAdminRouteActive()) return;
+            if (!window.isAdminRouteActive()) return;
 
             const revenue = window.state.orders.reduce((s, o) => s + Number(o.priceUSD || 0), 0);
             const pendingCount = window.state.deposits.filter(d => d.status === 'pending').length;
@@ -2853,6 +2849,11 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3200);
         };
+
+        // ==================== BOOT SEQUENCE (after ALL functions defined) ====================
+        loadLocalMirror();
+        window.initRoutingAndUI();
+        initFirebaseBackend();
     </script>
 </body>
 </html>

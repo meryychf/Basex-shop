@@ -245,10 +245,10 @@
 
                         <!-- Live Connection & Security Badge Box -->
                         <div class="w-full lg:w-80 bg-obsidian/90 border border-goldPrimary/25 rounded-2xl p-5 space-y-3.5 shrink-0">
-                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                                <span class="text-xs text-slate-400" data-i18n="db_status_label">حالة النظام والمتجر</span>
-                                <span id="sync-status-pill" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">LIVE SYNC</span>
-                            </div>
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="text-xs text-slate-400" data-i18n="db_status_label">حالة النظام والمتجر</span>
+                            <span id="sync-status-pill" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">CONNECTING...</span>
+                        </div>
                             <div class="flex items-center justify-between text-xs">
                                 <span class="text-slate-400" data-i18n="accepted_crypto">العملات المقبولة</span>
                                 <span class="font-mono font-bold text-goldLight">BTC • LTC • USDT</span>
@@ -657,26 +657,26 @@
 
                 <!-- Admin Tab 3: All Orders -->
                 <div id="apanel-orders" class="hidden space-y-4">
-                    <h3 class="text-lg font-extrabold text-white" data-i18n="adm_ord_heading">جميع عمليات الشراء المنفذة</h3>
-                    <div class="luxury-card rounded-2xl overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-start border-collapse">
-                                <thead>
-                                    <tr class="border-b border-slate-800 bg-obsidian/80 text-xs text-slate-400">
-                                        <th class="py-3.5 px-4 text-start">ID</th>
-                                        <th class="py-3.5 px-4 text-start" data-i18n="th_buyer">المشتري</th>
-                                        <th class="py-3.5 px-4 text-start" data-i18n="th_product">المنتج</th>
-                                        <th class="py-3.5 px-4 text-start" data-i18n="th_price">المبلغ</th>
-                                        <th class="py-3.5 px-4 text-start" data-i18n="th_date">التاريخ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="adm-orders-tbody" class="divide-y divide-slate-800/70 text-sm"></tbody>
-                            </table>
-                        </div>
+                <h3 class="text-lg font-extrabold text-white" data-i18n="adm_ord_heading">جميع عمليات الشراء المنفذة</h3>
+                <div class="luxury-card rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-start border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 bg-obsidian/80 text-xs text-slate-400">
+                                    <th class="py-3.5 px-4 text-start">ID</th>
+                                    <th class="py-3.5 px-4 text-start" data-i18n="th_buyer">المشتري</th>
+                                    <th class="py-3.5 px-4 text-start" data-i18n="th_product">المنتج</th>
+                                    <th class="py-3.5 px-4 text-start" data-i18n="th_price">المبلغ</th>
+                                    <th class="py-3.5 px-4 text-start" data-i18n="th_date">التاريخ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adm-orders-tbody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Admin Tab 4: Wallets & Admin Secret Code -->
+            <!-- Admin Tab 4: Wallets & Admin Secret Code -->
                 <div id="apanel-settings" class="hidden">
                     <div class="luxury-card rounded-3xl p-6 max-w-2xl space-y-5">
                         <h3 class="text-lg font-extrabold text-white" data-i18n="adm_set_heading">إعدادات محافظ الكريبتو ورمز الإدارة</h3>
@@ -923,20 +923,34 @@
 
     <!-- ==================== REAL FIREBASE + LIVE PERSISTENCE ENGINE ==================== -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // =========================================================================
+        // 1. إعدادات FIREBASE الحية لمشروع BaseX Shop (basex-shoop)
+        // جاهزة للعمل الفوري على GitHub Pages وجميع المتصفحات
+        // =========================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEbk8zGldbOpf9ErUhQY-zHdAm3Pj7VOk",
+            authDomain: "basex-shoop.firebaseapp.com",
+            projectId: "basex-shoop",
+            storageBucket: "basex-shoop.firebasestorage.app",
+            messagingSenderId: "422219485111",
+            appId: "1:422219485111:web:9a466fbcac1b167c336232"
+        };
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
         import { 
             getAuth, signInAnonymously, signInWithCustomToken, 
             signInWithEmailAndPassword, createUserWithEmailAndPassword, 
-            GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+            GoogleAuthProvider, signInWithPopup, onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
         import { 
-            getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, 
+            getFirestore, doc, setDoc, updateDoc, deleteDoc, 
             onSnapshot, collection 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-        // Environment Config Detection
-        const hasFirebaseEnv = typeof __firebase_config !== 'undefined' && __firebase_config;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'basex-shop-prod';
+        // Prioritizes your live basex-shoop Firebase project configuration
+        const activeConfig = firebaseConfig;
+        const appId = 'basex-shoop-live';
+
         let db = null;
         let auth = null;
         let firebaseReady = false;
@@ -1089,36 +1103,54 @@
 
         // ==================== INITIALIZE FIREBASE REALTIME PERSISTENCE ====================
         async function initFirebaseBackend() {
-            if (!hasFirebaseEnv) {
-                document.getElementById('sync-status-pill').textContent = 'LIVE DB';
+            const statusPill = document.getElementById('sync-status-pill');
+            if (!activeConfig) {
+                if (statusPill) {
+                    statusPill.textContent = 'DEMO / LOCAL';
+                    statusPill.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30';
+                }
                 return;
             }
 
             try {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
+                const app = initializeApp(activeConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Rule 3: Authenticate before Firestore queries
+                // Authenticate session before Firestore queries
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
+                } else if (!auth.currentUser) {
                     await signInAnonymously(auth);
                 }
 
                 firebaseReady = true;
-                document.getElementById('sync-status-pill').textContent = 'CLOUD LIVE';
+                if (statusPill) {
+                    statusPill.textContent = 'FIREBASE LIVE';
+                    statusPill.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+                }
 
-                // Rule 1: Strict public data paths /artifacts/{appId}/public/data/{collection}
+                // Listen to real Firebase Auth state changes (Email/Password or Google)
+                onAuthStateChanged(auth, (fbUser) => {
+                    if (fbUser && !fbUser.isAnonymous) {
+                        const existing = window.state.usersMap[fbUser.uid];
+                        if (existing) {
+                            window.state.currentUser = existing;
+                            saveLocalMirror();
+                            window.refreshUI();
+                        }
+                    }
+                });
+
+                // Firestore Realtime Collections (/artifacts/{appId}/public/data/...)
                 const productsCol = collection(db, 'artifacts', appId, 'public', 'data', 'products');
                 const depositsCol = collection(db, 'artifacts', appId, 'public', 'data', 'deposits');
                 const ordersCol = collection(db, 'artifacts', appId, 'public', 'data', 'orders');
                 const usersCol = collection(db, 'artifacts', appId, 'public', 'data', 'users');
                 const vouchersCol = collection(db, 'artifacts', appId, 'public', 'data', 'vouchers');
-                const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'wallets');
+                const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'store');
 
-                // Listen to Settings
+                // Listen to Store Settings (Wallets, Announcement, Admin Secret)
                 onSnapshot(settingsDoc, async (snap) => {
                     if (snap.exists()) {
                         window.state.settings = { ...SEED_SETTINGS, ...snap.data() };
@@ -1279,7 +1311,7 @@
             window.state.settings = { ...window.state.settings, ...newSettings };
             saveLocalMirror();
             if (firebaseReady && db) {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'wallets'), window.state.settings, { merge: true });
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'store'), window.state.settings, { merge: true });
             }
             window.refreshUI();
         };

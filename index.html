@@ -876,7 +876,7 @@
     <!-- ==================== MODAL C: ADMIN PRODUCT & FILE UPLOAD EDITOR ==================== -->
     <div id="modal-product-editor" class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md p-3 overflow-y-auto" style="display:none;align-items:flex-start;justify-content:center;">
         <div class="luxury-card rounded-3xl max-w-2xl w-full p-5 sm:p-7 relative my-6 mx-auto border-goldPrimary/40 shadow-gold-glow">
-            <button onclick="closeModal('modal-product-editor')" class="absolute top-4 left-4 w-9 h-9 rounded-xl bg-obsidian text-slate-400 hover:text-white flex items-center justify-center z-10">
+            <button onclick="closeModal('modal-product-editor')" class="absolute top-4 ltr:right-4 rtl:left-4 w-9 h-9 rounded-xl bg-obsidian text-slate-400 hover:text-white flex items-center justify-center z-10">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
 
@@ -1201,26 +1201,38 @@
                 auth = firebase.auth(app);
                 db = firebase.firestore(app);
 
-                // Anonymous auth session
-                if (!auth.currentUser) {
-                    await auth.signInAnonymously();
-                }
-
                 firebaseReady = true;
                 if (statusPill) {
                     statusPill.textContent = 'FIREBASE LIVE';
                     statusPill.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
                 }
 
-                // Auth state listener
+                // Auth state listener — restore logged-in user on reload
                 auth.onAuthStateChanged((fbUser) => {
                     if (fbUser && !fbUser.isAnonymous) {
                         const existing = window.state.usersMap[fbUser.uid];
                         if (existing) {
                             window.state.currentUser = existing;
-                            saveLocalMirror();
-                            if (typeof window.refreshUI === 'function') window.refreshUI();
+                        } else {
+                            // User exists in Firebase Auth but not yet in usersMap — create minimal entry
+                            const minimal = {
+                                uid: fbUser.uid,
+                                email: fbUser.email,
+                                displayName: fbUser.displayName || fbUser.email.split('@')[0],
+                                balanceUSD: 0.00,
+                                role: 'user',
+                                createdAt: new Date().toISOString()
+                            };
+                            window.state.currentUser = minimal;
+                            window.state.usersMap[fbUser.uid] = minimal;
                         }
+                        saveLocalMirror();
+                        if (typeof window.refreshUI === 'function') window.refreshUI();
+                    } else if (!fbUser) {
+                        // Signed out from Firebase side
+                        window.state.currentUser = null;
+                        saveLocalMirror();
+                        if (typeof window.refreshUI === 'function') window.refreshUI();
                     }
                 });
 
@@ -1550,11 +1562,13 @@
 
         window.logoutUser = async function() {
             window.state.currentUser = null;
+            try { sessionStorage.removeItem(SESSION_USER_KEY); } catch(e) {}
             saveLocalMirror();
             if (firebaseReady && auth) {
-                try { await auth.signInAnonymously(); } catch (e) {}
+                try { await auth.signOut(); } catch (e) {}
             }
             window.closeModal('modal-auth');
+            window.showToast(window.t('toast_logout'), 'success');
             if (typeof window.refreshUI === 'function') window.refreshUI();
             if (typeof window.showToast === 'function') window.showToast(typeof window.t === 'function' ? window.t('toast_logout') : 'تم الخروج', 'success');
         };
@@ -1692,7 +1706,37 @@
                 toast_prod_saved: 'تم حفظ المنتج ونشره في المتجر!',
                 toast_prod_deleted: 'تم حذف المنتج.',
                 toast_settings_saved: 'تم حفظ إعدادات المحافظ والأمان!',
-                toast_wrong_secret: 'رمز الدخول السري غير صحيح!'
+                toast_wrong_secret: 'رمز الدخول السري غير صحيح!',
+                btn_buy_now: 'اشتر الآن',
+                stock_in: 'متوفر:',
+                stock_out: 'نفذ المخزون',
+                cat_all: 'الكل',
+                cat_tools: '🔧 أدوات فحص',
+                cat_combos: '🗂️ كومبوهات',
+                cat_courses: '🎓 كورسات',
+                cat_accounts: '👤 حسابات',
+                search_placeholder: 'ابحث في المتجر...',
+                sort_default: 'الترتيب الافتراضي',
+                sort_low: 'السعر: الأقل أولاً',
+                sort_high: 'السعر: الأعلى أولاً',
+                no_products: 'لا توجد منتجات مطابقة للبحث',
+                sup_modal_title: 'مركز الدعم وبوت تليجرام الرسمي',
+                sup_modal_desc: 'تواصل مباشرة مع فريق وبوت BaseX على تليجرام لتأكيد عمليات الشحن أو الحصول على دعم فني فوري.',
+                btn_copy_ticket: 'نسخ بيانات حسابي للإرسال',
+                btn_open_telegram: 'فتح @basexsupport_bot',
+                current_balance: 'رصيدك الحالي',
+                db_status_label: 'حالة النظام والمتجر',
+                accepted_crypto: 'العملات المقبولة',
+                support_bot_label: 'بوت الدعم الرسمي',
+                active_account: 'الحساب النشط',
+                wallet_page_title: 'شحن رصيد المحفظة (Crypto)',
+                wallet_page_sub: 'اختر العملة الرقمية وحوّل المبلغ ثم أرسل رقم المعاملة TxID لتأكيد الشحن.',
+                float_support_sub: 'الدعم الفني المباشر',
+                my_deposits_title: 'سجل طلبات الشحن الخاصة بك',
+                orders_title: 'طلباتي ومشترياتي الرقمية',
+                orders_sub: 'يمكنك نسخ البيانات أو تحميل ملفات الأدوات والكورسات المشتراة في أي وقت.',
+                btn_copy_payload: 'نسخ المحتوى',
+                btn_download: 'تحميل الملف'
             },
             en: {
                 brand_subtitle: 'Premium Digital Tools, Combos & Courses',
@@ -1824,7 +1868,35 @@
                 toast_prod_saved: 'Product published to store!',
                 toast_prod_deleted: 'Product deleted.',
                 toast_settings_saved: 'Wallets & security settings saved!',
-                toast_wrong_secret: 'Invalid Admin Secret Code!'
+                toast_wrong_secret: 'Invalid Admin Secret Code!',
+                btn_buy_now: 'Buy Now',
+                stock_in: 'In Stock:',
+                stock_out: 'Out of Stock',
+                cat_all: 'All',
+                cat_tools: '🔧 Tools',
+                cat_combos: '🗂️ Combos',
+                cat_courses: '🎓 Courses',
+                cat_accounts: '👤 Accounts',
+                search_placeholder: 'Search the store...',
+                sort_default: 'Default Order',
+                sort_low: 'Price: Low to High',
+                sort_high: 'Price: High to Low',
+                no_products: 'No products match your search',
+                sup_modal_title: 'Support Center & Official Telegram Bot',
+                sup_modal_desc: 'Contact the BaseX team directly on Telegram to confirm deposits, buy gift vouchers, or get instant technical support.',
+                btn_copy_ticket: 'Copy My Account Info',
+                btn_open_telegram: 'Open @basexsupport_bot',
+                current_balance: 'Current Balance',
+                db_status_label: 'System & Store Status',
+                accepted_crypto: 'Accepted Currencies',
+                support_bot_label: 'Official Support Bot',
+                active_account: 'Active Account',
+                wallet_page_title: 'Top Up Your Wallet (Crypto)',
+                wallet_page_sub: 'Choose a crypto network, send the amount, then submit your TxID to confirm.',
+                float_support_sub: 'Live Technical Support',
+                my_deposits_title: 'Your Deposit History',
+                btn_copy_payload: 'Copy Payload',
+                btn_download: 'Download File'
             }
         };
 
@@ -2139,9 +2211,9 @@
                                 <span class="text-[10px] text-slate-500 block font-mono">USD</span>
                                 <span class="text-xl font-mono font-black text-goldLight">$${Number(p.priceUSD).toFixed(2)}</span>
                             </div>
-                            <button onclick="openProductQuickView('${p.id}')" class="min-h-[44px] px-4 py-2.5 rounded-xl ${inStock ? 'gold-btn font-black' : 'bg-slate-800 text-slate-500 font-bold'} text-xs flex items-center gap-1.5">
-                                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                                <span>${window.t('btn_buy_now')}</span>
+                            <button ${inStock ? `onclick="openProductQuickView('${p.id}')"` : 'disabled'} class="min-h-[44px] px-4 py-2.5 rounded-xl ${inStock ? 'gold-btn font-black cursor-pointer' : 'bg-slate-800 text-slate-500 font-bold cursor-not-allowed opacity-60'} text-xs flex items-center gap-1.5" ${!inStock ? 'aria-disabled="true"' : ''}>
+                                <i data-lucide="${inStock ? 'shopping-bag' : 'lock'}" class="w-4 h-4"></i>
+                                <span>${inStock ? window.t('btn_buy_now') : window.t('stock_out')}</span>
                             </button>
                         </div>
                     </div>
@@ -2215,7 +2287,16 @@
             window.showToast(window.t('toast_coupon_applied'), 'success');
         };
 
+        let _purchaseInProgress = false;
         window.executePurchase = async function(prodId) {
+            if (_purchaseInProgress) return;
+            _purchaseInProgress = true;
+
+            // Lock the buy button visually
+            const buyBtn = document.querySelector('#product-modal-body button[onclick*="executePurchase"]');
+            if (buyBtn) { buyBtn.disabled = true; buyBtn.textContent = '...جاري المعالجة'; }
+
+            try {
             const user = window.state.currentUser;
             if (!user) {
                 closeModal('modal-product');
@@ -2263,6 +2344,13 @@
             closeModal('modal-product');
             window.showToast(window.t('toast_buy_success'), 'success');
             switchPublicView('orders');
+            } catch(err) {
+                console.error('executePurchase error:', err);
+                window.showToast('❌ حدث خطأ أثناء الشراء، حاول مجدداً', 'error');
+                if (buyBtn) { buyBtn.disabled = false; buyBtn.innerHTML = '<i data-lucide="zap" class="w-4 h-4"></i> ' + window.t('btn_buy_now'); lucide.createIcons(); }
+            } finally {
+                _purchaseInProgress = false;
+            }
         };
 
         window.redeemGiftVoucher = async function(e) {
@@ -2342,16 +2430,20 @@
             if (titleEl) titleEl.textContent = titles[coin];
 
             const qrBox = document.getElementById('qrcode');
-            if (qrBox && addr) {
+            if (qrBox) {
                 qrBox.innerHTML = '';
-                new QRCode(qrBox, {
-                    text: addr,
-                    width: 140,
-                    height: 140,
-                    colorDark: '#070709',
-                    colorLight: '#FFFFFF',
-                    correctLevel: QRCode.CorrectLevel.M
-                });
+                if (addr) {
+                    new QRCode(qrBox, {
+                        text: addr,
+                        width: 140,
+                        height: 140,
+                        colorDark: '#070709',
+                        colorLight: '#FFFFFF',
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } else {
+                    qrBox.innerHTML = '<div class="flex items-center justify-center w-36 h-36 mx-auto rounded-xl border border-goldPrimary/30 bg-obsidian text-xs text-center text-slate-400 p-3">لم يتم تكوين عنوان المحفظة بعد</div>';
+                }
             }
         };
 
@@ -2419,6 +2511,10 @@
             }).join('');
         }
 
+        function escHtml(str) {
+            return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        }
+
         // ==================== USER ORDERS & DOWNLOADS ====================
         function renderUserOrders() {
             const list = document.getElementById('user-orders-list');
@@ -2441,24 +2537,29 @@
 
             const lang = window.state.lang;
             list.innerHTML = myOrders.map(o => {
-                const title = lang === 'ar' ? o.productTitleAr : o.productTitleEn;
+                const title = escHtml(lang === 'ar' ? (o.productTitleAr || o.productTitleEn) : (o.productTitleEn || o.productTitleAr));
+                const safeId = escHtml(o.id);
+                const safeDate = escHtml(o.createdAt);
+                const safePrice = Number(o.priceUSD).toFixed(2);
+                const safeFile = escHtml(o.deliveryFileName || 'Digital_Asset.txt');
+                const safeContent = escHtml(o.deliveryContent || '');
                 return `
                     <div class="luxury-card rounded-2xl p-5 space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="px-2.5 py-0.5 rounded bg-goldPrimary/15 text-goldLight font-mono text-xs font-bold">${o.id}</span>
-                                    <span class="text-xs font-mono text-slate-400">${o.createdAt}</span>
+                                    <span class="px-2.5 py-0.5 rounded bg-goldPrimary/15 text-goldLight font-mono text-xs font-bold">${safeId}</span>
+                                    <span class="text-xs font-mono text-slate-400">${safeDate}</span>
                                 </div>
                                 <h3 class="text-base sm:text-lg font-extrabold text-white mt-1">${title}</h3>
                             </div>
-                            <div class="flex items-center gap-2.5">
-                                <span class="text-lg font-mono font-black text-goldLight">$${Number(o.priceUSD).toFixed(2)}</span>
-                                <button onclick="downloadPayload('${o.id}')" class="gold-btn px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-1.5">
+                            <div class="flex items-center gap-2.5 flex-wrap">
+                                <span class="text-lg font-mono font-black text-goldLight">$${safePrice}</span>
+                                <button onclick="downloadPayload('${safeId}')" class="gold-btn px-4 py-2 rounded-xl font-extrabold text-xs flex items-center gap-1.5">
                                     <i data-lucide="download" class="w-4 h-4"></i>
                                     <span>${window.t('btn_download')}</span>
                                 </button>
-                                <button onclick="copyOrderText('${o.id}')" class="px-3.5 py-2 rounded-xl bg-obsidian hover:bg-charcoal text-goldLight border border-goldPrimary/30 font-bold text-xs flex items-center gap-1.5">
+                                <button onclick="copyOrderText('${safeId}')" class="px-3.5 py-2 rounded-xl bg-obsidian hover:bg-charcoal text-goldLight border border-goldPrimary/30 font-bold text-xs flex items-center gap-1.5">
                                     <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                                     <span>${window.t('btn_copy_payload')}</span>
                                 </button>
@@ -2467,9 +2568,9 @@
                         <div class="bg-obsidian border border-goldPrimary/20 rounded-xl p-4">
                             <div class="text-[11px] font-mono text-goldLight mb-1.5 flex items-center gap-1.5">
                                 <i data-lucide="file-key" class="w-3.5 h-3.5"></i>
-                                <span>${o.deliveryFileName || 'Digital_Asset.txt'}</span>
+                                <span>${safeFile}</span>
                             </div>
-                            <pre class="text-xs font-mono text-emerald-300 whitespace-pre-wrap break-all leading-relaxed">${o.deliveryContent}</pre>
+                            <pre class="text-xs font-mono text-emerald-300 whitespace-pre-wrap break-all leading-relaxed">${safeContent}</pre>
                         </div>
                     </div>
                 `;
@@ -2615,8 +2716,8 @@
                         const title = lang === 'ar' ? (o.productTitleAr||o.productTitleEn) : (o.productTitleEn||o.productTitleAr);
                         return '<tr class="hover:bg-obsidian/50">' +
                             '<td class="py-3 px-4 font-mono text-xs text-goldLight">' + o.id + '</td>' +
-                            '<td class="py-3 px-4 font-bold text-sm text-white">' + title + '</td>' +
                             '<td class="py-3 px-4 font-mono text-xs text-slate-300">' + (o.userEmail||o.userId) + '</td>' +
+                            '<td class="py-3 px-4 font-bold text-sm text-white">' + title + '</td>' +
                             '<td class="py-3 px-4 font-mono font-bold text-emerald-400">$' + Number(o.priceUSD).toFixed(2) + '</td>' +
                             '<td class="py-3 px-4 text-xs text-slate-400">' + o.createdAt + '</td>' +
                         '</tr>';
@@ -2919,6 +3020,9 @@
         };
 
         window.deleteAdminProduct = async function(prodId) {
+            const p = window.state.products.find(x => x.id === prodId);
+            const name = p ? (p.titleAr || p.titleEn || prodId) : prodId;
+            if (!confirm('⚠️ هل أنت متأكد من حذف المنتج؟\n\n' + name)) return;
             await window.dbDeleteProduct(prodId);
             window.showToast(window.t('toast_prod_deleted'), 'success');
         };
@@ -2958,8 +3062,12 @@
         window.openModal = function(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.style.display = 'flex';
             el.classList.remove('hidden');
+            // modal-product-editor uses flex-start layout, others center
+            el.style.display = id === 'modal-product-editor' ? 'flex' : 'flex';
+            el.style.alignItems = id === 'modal-product-editor' ? 'flex-start' : 'center';
+            el.style.justifyContent = 'center';
+            document.body.style.overflow = 'hidden';
         };
 
         window.closeModal = function(id) {
@@ -2967,6 +3075,10 @@
             if (!el) return;
             el.style.display = 'none';
             el.classList.add('hidden');
+            // Restore scroll only if no other modals open
+            const anyOpen = ['modal-auth','modal-product','modal-product-editor','modal-support']
+                .some(mid => { const m = document.getElementById(mid); return m && m.style.display !== 'none' && !m.classList.contains('hidden'); });
+            if (!anyOpen) document.body.style.overflow = '';
         };
 
         window.copyText = function(text) {

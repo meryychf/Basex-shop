@@ -301,6 +301,8 @@
                         <button onclick="setCategory('combos')" data-cat="combos" class="cat-btn min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all shrink-0" data-i18n="cat_combos">كومبوهات</button>
                         <button onclick="setCategory('courses')" data-cat="courses" class="cat-btn min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all shrink-0" data-i18n="cat_courses">كورسات</button>
                         <button onclick="setCategory('accounts')" data-cat="accounts" class="cat-btn min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all shrink-0" data-i18n="cat_accounts">حسابات</button>
+                        <button onclick="setCategory('emails')" data-cat="emails" class="cat-btn min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all shrink-0">📧 إيميلات</button>
+                        <button onclick="setCategory('files')" data-cat="files" class="cat-btn min-h-[40px] px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap bg-obsidian text-slate-300 hover:text-goldLight border border-slate-800 transition-all shrink-0">📁 ملفات</button>
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -871,101 +873,140 @@
     </div>
 
     <!-- ==================== MODAL C: ADMIN PRODUCT & FILE UPLOAD EDITOR ==================== -->
-    <div id="modal-product-editor" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-4">
-        <div class="luxury-card rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 relative border-goldPrimary/35">
-            <button onclick="closeModal('modal-product-editor')" class="absolute top-4 ltr:right-4 rtl:left-4 w-9 h-9 rounded-xl bg-obsidian text-slate-400 hover:text-white flex items-center justify-center">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-            <div id="product-modal-body"></div>
-        </div>
-    </div>
-
     <!-- ==================== MODAL C: ADMIN PRODUCT & FILE UPLOAD EDITOR ==================== -->
-    <div id="modal-product-editor" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
-        <div class="luxury-card rounded-3xl max-w-2xl w-full p-6 relative my-auto border-goldPrimary/35">
-            <button onclick="closeModal('modal-product-editor')" class="absolute top-4 ltr:right-4 rtl:left-4 w-8 h-8 rounded-lg bg-obsidian text-slate-400 hover:text-white flex items-center justify-center">
+    <div id="modal-product-editor" class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md p-3 overflow-y-auto" style="display:none;align-items:flex-start;justify-content:center;">
+        <div class="luxury-card rounded-3xl max-w-2xl w-full p-5 sm:p-7 relative my-6 mx-auto border-goldPrimary/40 shadow-gold-glow">
+            <button onclick="closeModal('modal-product-editor')" class="absolute top-4 left-4 w-9 h-9 rounded-xl bg-obsidian text-slate-400 hover:text-white flex items-center justify-center z-10">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
 
-            <h3 id="editor-modal-title" class="text-lg font-black text-white mb-4" data-i18n="btn_new_product">إضافة منتج جديد</h3>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-goldPrimary/15 flex items-center justify-center border border-goldPrimary/30">
+                    <i data-lucide="package-plus" class="w-5 h-5 text-goldLight"></i>
+                </div>
+                <div>
+                    <h3 id="editor-modal-title" class="text-base font-black text-white">إضافة منتج جديد</h3>
+                    <p class="text-[11px] text-slate-500">سيُنشر فوراً في المتجر بعد الحفظ</p>
+                </div>
+            </div>
 
-            <form onsubmit="saveProductFromEditor(event)" class="space-y-4">
+            <form onsubmit="saveProductFromEditor(event)" class="space-y-5">
                 <input type="hidden" id="edit-prod-id">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+
+                <!-- Names -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_title_ar">اسم المنتج (عربي)</label>
-                        <input type="text" id="edit-title-ar" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5">اسم المنتج (عربي) *</label>
+                        <input type="text" id="edit-title-ar" required placeholder="مثال: أداة فحص NetScope Pro" class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_title_en">Product Title (English)</label>
-                        <input type="text" id="edit-title-en" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5">Product Title (English) *</label>
+                        <input type="text" id="edit-title-en" required placeholder="e.g. NetScope Pro Checker" class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-sm text-white outline-none transition-colors">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="th_category">القسم</label>
-                        <select id="edit-category" class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none">
-                            <option value="tools">أدوات فحص / Tools</option>
-                            <option value="combos">كومبوهات / Combos</option>
-                            <option value="courses">كورسات / Courses</option>
-                            <option value="accounts">حسابات / Accounts</option>
+                <!-- Category + Type + Price + Stock -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5">القسم *</label>
+                        <select id="edit-category" class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                            <option value="tools">🔧 أدوات / Tools</option>
+                            <option value="combos">🗂️ كومبوهات / Combos</option>
+                            <option value="courses">🎓 كورسات / Courses</option>
+                            <option value="accounts">👤 حسابات / Accounts</option>
+                            <option value="emails">📧 إيميلات / Emails</option>
+                            <option value="files">📁 ملفات / Files</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5">نوع التسليم *</label>
+                        <select id="edit-delivery-type" onchange="onDeliveryTypeChange()" class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3 py-2.5 text-sm text-white outline-none">
+                            <option value="text">📝 نص / بيانات</option>
+                            <option value="credentials">🔑 حسابات (user:pass)</option>
+                            <option value="emails_list">📧 قائمة إيميلات</option>
+                            <option value="combo">🗂️ كومبو (email:pass)</option>
+                            <option value="link">🔗 رابط تحميل</option>
+                            <option value="file">📦 ملف مرفق</option>
+                            <option value="course_link">🎓 رابط كورس</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="th_price">السعر ($ USD)</label>
-                        <input type="number" id="edit-price" min="0.5" step="0.01" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm font-mono text-white outline-none">
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5">السعر $ *</label>
+                        <input type="number" id="edit-price" min="0.1" step="0.01" required placeholder="4.99" class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3 py-2.5 text-sm font-mono text-goldLight outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="th_stock">الكمية (Stock)</label>
-                        <input type="number" id="edit-stock" min="0" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm font-mono text-white outline-none">
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5">الكمية *</label>
+                        <input type="number" id="edit-stock" min="0" required placeholder="100" class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3 py-2.5 text-sm font-mono text-white outline-none">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <!-- Descriptions -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_desc_ar">الوصف (عربي)</label>
-                        <textarea id="edit-desc-ar" rows="2" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none"></textarea>
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5">الوصف (عربي) *</label>
+                        <textarea id="edit-desc-ar" rows="3" required placeholder="وصف المنتج بالعربي..." class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-sm text-white outline-none resize-none"></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1" data-i18n="label_desc_en">Description (English)</label>
-                        <textarea id="edit-desc-en" rows="2" required class="w-full bg-obsidian border border-slate-800 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-sm text-white outline-none"></textarea>
+                        <label class="block text-[11px] font-bold text-slate-400 mb-1.5">Description (English) *</label>
+                        <textarea id="edit-desc-en" rows="3" required placeholder="Product description in English..." class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-sm text-white outline-none resize-none"></textarea>
                     </div>
                 </div>
 
-                <!-- Product Cover Image Upload -->
-                <div class="p-3.5 rounded-xl bg-obsidian border border-slate-800 space-y-2">
-                    <label class="block text-xs font-bold text-goldLight" data-i18n="label_cover_img">صورة الغلاف (رفع من جهازك أو رابط مباشر)</label>
-                    <div class="flex flex-col sm:flex-row gap-2.5">
-                        <input type="file" accept="image/*" onchange="handleCoverImageUpload(event)" class="text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-goldPrimary/20 file:text-goldLight">
-                        <input type="text" id="edit-image-url" placeholder="https://... أو اتركه فارغاً للأيقونة الذهبية" class="flex-1 bg-charcoal border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-mono text-white outline-none">
+                <!-- Cover Image -->
+                <div class="p-4 rounded-2xl bg-obsidian border border-slate-800 space-y-2.5">
+                    <label class="block text-[11px] font-bold text-goldLight">🖼️ صورة الغلاف</label>
+                    <div class="flex flex-col sm:flex-row gap-2.5 items-center">
+                        <label class="cursor-pointer shrink-0 px-4 py-2 rounded-xl gold-btn text-xs font-extrabold inline-flex items-center gap-2">
+                            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                            رفع صورة
+                            <input type="file" accept="image/*" onchange="handleCoverImageUpload(event)" class="hidden">
+                        </label>
+                        <input type="text" id="edit-image-url" placeholder="أو الصق رابط الصورة https://..." class="flex-1 w-full bg-charcoal border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none">
+                        <div id="edit-image-preview" class="shrink-0 w-14 h-14 rounded-xl bg-charcoal border border-slate-700 overflow-hidden" style="display:none;">
+                            <img id="edit-image-preview-img" class="w-full h-full object-cover" src="" alt="">
+                        </div>
                     </div>
                 </div>
 
-                <!-- Private Digital Deliverable Payload / File Attachment -->
-                <div class="p-3.5 rounded-xl bg-obsidian border border-goldPrimary/30 space-y-2.5">
+                <!-- Digital Payload -->
+                <div class="p-4 rounded-2xl bg-obsidian border border-goldPrimary/25 space-y-3">
                     <div class="flex flex-wrap items-center justify-between gap-2">
-                        <label class="text-xs font-bold text-goldLight" data-i18n="label_private_payload">المحتوى أو الملف الرقمي السري (يظهر للمشتري فقط بعد الدفع)</label>
-                        <label class="cursor-pointer px-3 py-1 rounded-lg gold-btn text-xs font-extrabold inline-flex items-center gap-1.5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-goldLight">🔐 المحتوى الرقمي السري</label>
+                            <p class="text-[10px] text-slate-500 mt-0.5">يظهر للمشتري فقط بعد إتمام الدفع</p>
+                        </div>
+                        <label class="cursor-pointer px-3 py-1.5 rounded-xl gold-btn text-xs font-extrabold inline-flex items-center gap-1.5">
                             <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                            <span data-i18n="btn_attach_file">رفع ملف من جهازك</span>
+                            رفع ملف
                             <input type="file" onchange="handlePrivateFileAttachment(event)" class="hidden">
                         </label>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <select id="edit-delivery-type" class="bg-charcoal border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white outline-none">
-                            <option value="text">نص / بيانات حسابات / روابط (Text / Credentials)</option>
-                            <option value="file">ملف قابل للتحميل (Downloadable File)</option>
-                        </select>
-                        <input type="text" id="edit-delivery-filename" placeholder="اسم الملف (مثال: BaseX_Tool_v5.txt)" class="bg-charcoal border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-mono text-goldLight outline-none">
+
+                    <!-- Dynamic placeholder hint -->
+                    <div id="delivery-hint" class="text-[10px] text-slate-500 px-1"></div>
+
+                    <input type="text" id="edit-delivery-filename" placeholder="اسم الملف للمشتري (مثال: BaseX_Combo_Pack.txt)" class="w-full bg-charcoal border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-goldLight outline-none">
+
+                    <textarea id="edit-delivery-content" rows="5" placeholder="أدخل المحتوى هنا..." class="w-full bg-charcoal border border-slate-700 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-xs font-mono text-emerald-300 outline-none resize-y"></textarea>
+
+                    <div class="flex items-center justify-between text-[10px] text-slate-500">
+                        <span id="delivery-line-count">0 سطر</span>
+                        <span id="delivery-char-count">0 حرف</span>
                     </div>
-                    <textarea id="edit-delivery-content" rows="3" required placeholder="أدخل محتوى الملف أو الحسابات أو رابط التحميل المشفر هنا..." class="w-full bg-charcoal border border-slate-700 focus:border-goldPrimary rounded-xl px-3.5 py-2 text-xs font-mono text-emerald-300 outline-none"></textarea>
                 </div>
 
-                <div class="flex justify-end gap-2.5 pt-2">
-                    <button type="button" onclick="closeModal('modal-product-editor')" class="px-4 py-2.5 rounded-xl bg-obsidian text-slate-300 text-xs font-bold" data-i18n="btn_cancel">إلغاء</button>
-                    <button type="submit" class="gold-btn px-6 py-2.5 rounded-xl font-black text-xs sm:text-sm" data-i18n="btn_save_product">حفظ ونشر المنتج</button>
+                <!-- Tags (optional) -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 mb-1.5">🏷️ تاغات (اختياري، مفصولة بفواصل)</label>
+                    <input type="text" id="edit-tags" placeholder="مثال: netflix, premium, 4k" class="w-full bg-obsidian border border-slate-700 focus:border-goldPrimary rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-1">
+                    <button type="button" onclick="closeModal('modal-product-editor')" class="px-5 py-2.5 rounded-xl bg-obsidian border border-slate-700 text-slate-300 text-xs font-bold hover:border-slate-500">إلغاء</button>
+                    <button type="submit" id="editor-save-btn" class="gold-btn px-7 py-2.5 rounded-xl font-black text-sm flex items-center gap-2">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        حفظ ونشر
+                    </button>
                 </div>
             </form>
         </div>
@@ -1401,85 +1442,84 @@
         // ==================== REAL AUTHENTICATION HANDLERS ====================
         window.handleEmailAuth = async function(e) {
             e.preventDefault();
+            const btn = document.getElementById('auth-submit-btn');
             const email = document.getElementById('auth-email').value.trim().toLowerCase();
             const password = document.getElementById('auth-password').value;
-            const nameInput = document.getElementById('auth-name').value.trim();
+            const nameInput = document.getElementById('auth-name') ? document.getElementById('auth-name').value.trim() : '';
+            const isRegister = window.state.authMode === 'register';
 
             if (!email || !password) return;
             if (password.length < 6) {
-                window.showToast(window.t('toast_short_pass'), 'error');
+                window.showToast(typeof window.t === 'function' ? window.t('toast_short_pass') : 'كلمة المرور قصيرة جداً (6 أحرف على الأقل)', 'error');
                 return;
             }
 
-            // Real Firebase Email/Password Authentication when cloud auth is active
+            // Lock button
+            const origText = btn ? btn.textContent : '';
+            if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+            const done = (success, msg) => {
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
+                if (success) {
+                    window.closeModal('modal-auth');
+                    window.showToast(msg || (typeof window.t === 'function' ? window.t('toast_login_ok') : 'تم تسجيل الدخول ✓'), 'success');
+                    if (typeof window.refreshUI === 'function') window.refreshUI();
+                } else {
+                    window.showToast(msg, 'error');
+                }
+            };
+
+            // Firebase auth
             if (firebaseReady && auth) {
                 try {
                     let cred;
-                    if (window.state.authMode === 'register') {
+                    if (isRegister) {
                         cred = await auth.createUserWithEmailAndPassword(email, password);
                     } else {
-                        try {
-                            cred = await auth.signInWithEmailAndPassword(email, password);
-                        } catch (loginErr) {
-                            if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential') {
-                                window.showToast(window.t('toast_invalid_cred'), 'error');
-                                return;
-                            }
-                            throw loginErr;
-                        }
+                        cred = await auth.signInWithEmailAndPassword(email, password);
                     }
-
                     const fbUser = cred.user;
                     const existing = window.state.usersMap[fbUser.uid];
-                    await window.dbUpsertUser(existing || {
+                    const userObj = existing || {
                         uid: fbUser.uid,
                         email: fbUser.email,
                         displayName: nameInput || fbUser.email.split('@')[0],
                         balanceUSD: 0.00,
                         role: 'user',
                         createdAt: new Date().toISOString()
-                    });
-
-                    window.closeModal('modal-auth');
-                    window.showToast(window.t('toast_login_ok'), 'success');
+                    };
+                    await window.dbUpsertUser(userObj);
+                    done(true, isRegister ? '🎉 تم إنشاء الحساب بنجاح!' : '✅ مرحباً بعودتك!');
                     return;
                 } catch (err) {
-                    if (err.code === 'auth/email-already-in-use') {
-                        window.showToast(window.t('toast_email_used'), 'error');
-                        return;
-                    }
-                    // Continue to local credential store if Email/Password provider isn't enabled in Firebase console
+                    const code = err.code || '';
+                    if (code === 'auth/email-already-in-use') { done(false, '⚠️ هذا الإيميل مسجل مسبقاً، سجّل الدخول بدلاً منه'); return; }
+                    if (code === 'auth/user-not-found' || code === 'auth/invalid-credential' || code === 'auth/wrong-password') { done(false, '❌ إيميل أو كلمة مرور خاطئة'); return; }
+                    if (code === 'auth/invalid-email') { done(false, '❌ صيغة الإيميل غير صحيحة'); return; }
+                    if (code === 'auth/too-many-requests') { done(false, '⏳ محاولات كثيرة، انتظر قليلاً'); return; }
+                    // Fall through to local mode
+                    console.warn('Firebase auth failed, using local mode:', err.code);
                 }
             }
 
-            // Local Verified Credential Store Fallback
+            // Local fallback
             const uid = 'usr_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
             const existing = window.state.usersMap[uid];
-
-            if (window.state.authMode === 'register') {
-                if (existing) {
-                    window.showToast(window.t('toast_email_used'), 'error');
-                    return;
-                }
+            if (isRegister) {
+                if (existing) { done(false, '⚠️ هذا الإيميل مسجل مسبقاً'); return; }
                 await window.dbUpsertUser({
-                    uid,
-                    email,
+                    uid, email,
                     passwordHash: btoa(password),
                     displayName: nameInput || email.split('@')[0],
-                    balanceUSD: 0.00,
-                    role: 'user',
+                    balanceUSD: 0.00, role: 'user',
                     createdAt: new Date().toISOString()
                 });
             } else {
-                if (!existing || (existing.passwordHash && existing.passwordHash !== btoa(password))) {
-                    window.showToast(window.t('toast_invalid_cred'), 'error');
-                    return;
-                }
+                if (!existing) { done(false, '❌ الحساب غير موجود، سجّل أولاً'); return; }
+                if (existing.passwordHash && existing.passwordHash !== btoa(password)) { done(false, '❌ كلمة المرور خاطئة'); return; }
                 await window.dbUpsertUser(existing);
             }
-
-            window.closeModal('modal-auth');
-            window.showToast(window.t('toast_login_ok'), 'success');
+            done(true, isRegister ? '🎉 تم إنشاء الحساب!' : '✅ مرحباً!');
         };
 
         window.handleGoogleSignIn = async function() {
@@ -2028,10 +2068,12 @@
 
         function getCategoryName(cat) {
             const map = {
-                tools: window.t('cat_tools'),
-                combos: window.t('cat_combos'),
-                courses: window.t('cat_courses'),
-                accounts: window.t('cat_accounts')
+                tools:    window.t('cat_tools')    || '🔧 أدوات',
+                combos:   window.t('cat_combos')   || '🗂️ كومبوهات',
+                courses:  window.t('cat_courses')  || '🎓 كورسات',
+                accounts: window.t('cat_accounts') || '👤 حسابات',
+                emails:   '📧 إيميلات',
+                files:    '📁 ملفات',
             };
             return map[cat] || cat;
         }
@@ -2702,46 +2744,111 @@
         };
 
         // ==================== ADMIN PRODUCT & FILE UPLOAD EDITOR ====================
+        const DELIVERY_HINTS = {
+            text: 'أدخل أي نص أو بيانات — يظهر للمشتري مباشرة بعد الدفع',
+            credentials: 'صيغة: username:password (سطر لكل حساب)\nمثال:\nuser1@gmail.com:pass123\nuser2@hotmail.com:pass456',
+            emails_list: 'قائمة إيميلات — سطر لكل إيميل\nمثال:\ntest1@gmail.com\ntest2@yahoo.com',
+            combo: 'كومبو — email:password (سطر لكل واحد)\nمثال:\nuser@gmail.com:password123',
+            link: 'الصق رابط التحميل المباشر\nمثال: https://mega.nz/...',
+            file: 'محتوى الملف كاملاً — سيتم إرساله كملف للمشتري',
+            course_link: 'رابط الكورس أو بيانات الوصول\nمثال: https://udemy.com/... | pass: basex2026',
+        };
+
+        window.onDeliveryTypeChange = function() {
+            const type = document.getElementById('edit-delivery-type').value;
+            const hint = document.getElementById('delivery-hint');
+            const textarea = document.getElementById('edit-delivery-content');
+            if (hint) hint.textContent = DELIVERY_HINTS[type] || '';
+            if (textarea) textarea.placeholder = DELIVERY_HINTS[type] || 'أدخل المحتوى هنا...';
+        };
+
         window.openProductEditor = function(prodId = null) {
-            document.getElementById('edit-prod-id').value = '';
-            document.getElementById('edit-title-ar').value = '';
-            document.getElementById('edit-title-en').value = '';
-            document.getElementById('edit-category').value = 'tools';
-            document.getElementById('edit-price').value = '';
-            document.getElementById('edit-stock').value = '10';
-            document.getElementById('edit-desc-ar').value = '';
-            document.getElementById('edit-desc-en').value = '';
-            document.getElementById('edit-image-url').value = '';
-            document.getElementById('edit-delivery-type').value = 'text';
-            document.getElementById('edit-delivery-filename').value = '';
-            document.getElementById('edit-delivery-content').value = '';
+            const fields = {
+                'edit-prod-id': '',
+                'edit-title-ar': '',
+                'edit-title-en': '',
+                'edit-category': 'tools',
+                'edit-price': '',
+                'edit-stock': '10',
+                'edit-desc-ar': '',
+                'edit-desc-en': '',
+                'edit-image-url': '',
+                'edit-delivery-type': 'text',
+                'edit-delivery-filename': '',
+                'edit-delivery-content': '',
+                'edit-tags': '',
+            };
+            Object.entries(fields).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            });
+
+            const titleEl = document.getElementById('editor-modal-title');
+            const previewEl = document.getElementById('edit-image-preview');
+            if (previewEl) previewEl.style.display = 'none';
 
             if (prodId) {
                 const p = window.state.products.find(x => x.id === prodId);
                 if (p) {
-                    document.getElementById('edit-prod-id').value = p.id;
-                    document.getElementById('edit-title-ar').value = p.titleAr;
-                    document.getElementById('edit-title-en').value = p.titleEn;
-                    document.getElementById('edit-category').value = p.category;
-                    document.getElementById('edit-price').value = p.priceUSD;
-                    document.getElementById('edit-stock').value = p.stock;
-                    document.getElementById('edit-desc-ar').value = p.descAr;
-                    document.getElementById('edit-desc-en').value = p.descEn;
-                    document.getElementById('edit-image-url').value = p.imageUrl || '';
-                    document.getElementById('edit-delivery-type').value = p.deliveryType || 'text';
-                    document.getElementById('edit-delivery-filename').value = p.deliveryFileName || '';
-                    document.getElementById('edit-delivery-content').value = p.deliveryContent || '';
+                    if (titleEl) titleEl.textContent = 'تعديل المنتج';
+                    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+                    setVal('edit-prod-id', p.id);
+                    setVal('edit-title-ar', p.titleAr);
+                    setVal('edit-title-en', p.titleEn);
+                    setVal('edit-category', p.category || 'tools');
+                    setVal('edit-price', p.priceUSD);
+                    setVal('edit-stock', p.stock);
+                    setVal('edit-desc-ar', p.descAr);
+                    setVal('edit-desc-en', p.descEn);
+                    setVal('edit-image-url', p.imageUrl || '');
+                    setVal('edit-delivery-type', p.deliveryType || 'text');
+                    setVal('edit-delivery-filename', p.deliveryFileName || '');
+                    setVal('edit-delivery-content', p.deliveryContent || '');
+                    setVal('edit-tags', (p.tags || []).join(', '));
+                    if (p.imageUrl && previewEl) {
+                        previewEl.style.display = 'block';
+                        const img = document.getElementById('edit-image-preview-img');
+                        if (img) img.src = p.imageUrl;
+                    }
                 }
+            } else {
+                if (titleEl) titleEl.textContent = 'إضافة منتج جديد';
             }
+
+            window.onDeliveryTypeChange();
+            updateDeliveryCount();
+
+            // Wire up live counter
+            const ta = document.getElementById('edit-delivery-content');
+            if (ta) {
+                ta.oninput = updateDeliveryCount;
+            }
+
             openModal('modal-product-editor');
+            setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
         };
+
+        function updateDeliveryCount() {
+            const ta = document.getElementById('edit-delivery-content');
+            const lc = document.getElementById('delivery-line-count');
+            const cc = document.getElementById('delivery-char-count');
+            if (!ta) return;
+            const lines = ta.value ? ta.value.split('\n').length : 0;
+            if (lc) lc.textContent = lines + ' سطر';
+            if (cc) cc.textContent = ta.value.length + ' حرف';
+        }
 
         window.handleCoverImageUpload = function(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('edit-image-url').value = e.target.result;
+            reader.onload = function(ev) {
+                const urlEl = document.getElementById('edit-image-url');
+                const previewEl = document.getElementById('edit-image-preview');
+                const img = document.getElementById('edit-image-preview-img');
+                if (urlEl) urlEl.value = ev.target.result;
+                if (previewEl) previewEl.style.display = 'block';
+                if (img) img.src = ev.target.result;
             };
             reader.readAsDataURL(file);
         };
@@ -2749,37 +2856,66 @@
         window.handlePrivateFileAttachment = function(event) {
             const file = event.target.files[0];
             if (!file) return;
-            document.getElementById('edit-delivery-type').value = 'file';
-            document.getElementById('edit-delivery-filename').value = file.name;
+            const typeEl = document.getElementById('edit-delivery-type');
+            const fnEl = document.getElementById('edit-delivery-filename');
+            if (typeEl) typeEl.value = 'file';
+            if (fnEl) fnEl.value = file.name;
+
             const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('edit-delivery-content').value = e.target.result;
+            reader.onload = function(ev) {
+                const ta = document.getElementById('edit-delivery-content');
+                if (ta) {
+                    ta.value = ev.target.result;
+                    updateDeliveryCount();
+                }
             };
-            reader.readAsText(file);
+            // Try text first; for binary files fall back to base64
+            if (file.type.startsWith('text/') || file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsDataURL(file);
+            }
+            window.showToast('✅ تم رفع الملف: ' + file.name, 'success');
         };
 
         window.saveProductFromEditor = async function(e) {
             e.preventDefault();
-            const existingId = document.getElementById('edit-prod-id').value;
-            const prodObj = {
-                id: existingId || 'bx-' + Date.now(),
-                titleAr: document.getElementById('edit-title-ar').value.trim(),
-                titleEn: document.getElementById('edit-title-en').value.trim(),
-                category: document.getElementById('edit-category').value,
-                priceUSD: parseFloat(document.getElementById('edit-price').value),
-                stock: parseInt(document.getElementById('edit-stock').value, 10),
-                descAr: document.getElementById('edit-desc-ar').value.trim(),
-                descEn: document.getElementById('edit-desc-en').value.trim(),
-                imageUrl: document.getElementById('edit-image-url').value.trim(),
-                deliveryType: document.getElementById('edit-delivery-type').value,
-                deliveryFileName: document.getElementById('edit-delivery-filename').value.trim() || 'BaseX_Asset.txt',
-                deliveryContent: document.getElementById('edit-delivery-content').value.trim(),
-                createdAt: new Date().toISOString()
-            };
+            const btn = document.getElementById('editor-save-btn');
+            if (btn) { btn.disabled = true; btn.textContent = '...جاري الحفظ'; }
 
-            await window.dbSaveProduct(prodObj);
-            closeModal('modal-product-editor');
-            window.showToast(window.t('toast_prod_saved'), 'success');
+            try {
+                const existingId = document.getElementById('edit-prod-id').value;
+                const tagsRaw = document.getElementById('edit-tags') ? document.getElementById('edit-tags').value : '';
+                const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+
+                const prodObj = {
+                    id: existingId || 'bx-' + Date.now(),
+                    titleAr: document.getElementById('edit-title-ar').value.trim(),
+                    titleEn: document.getElementById('edit-title-en').value.trim(),
+                    category: document.getElementById('edit-category').value,
+                    priceUSD: parseFloat(document.getElementById('edit-price').value) || 0,
+                    stock: parseInt(document.getElementById('edit-stock').value, 10) || 0,
+                    descAr: document.getElementById('edit-desc-ar').value.trim(),
+                    descEn: document.getElementById('edit-desc-en').value.trim(),
+                    imageUrl: document.getElementById('edit-image-url').value.trim(),
+                    deliveryType: document.getElementById('edit-delivery-type').value,
+                    deliveryFileName: document.getElementById('edit-delivery-filename').value.trim() || ('BaseX_' + Date.now() + '.txt'),
+                    deliveryContent: document.getElementById('edit-delivery-content').value.trim(),
+                    tags,
+                    updatedAt: new Date().toISOString(),
+                    createdAt: existingId ? undefined : new Date().toISOString(),
+                };
+                if (!prodObj.createdAt) delete prodObj.createdAt;
+
+                await window.dbSaveProduct(prodObj);
+                closeModal('modal-product-editor');
+                window.showToast('✅ تم حفظ المنتج ونشره في المتجر!', 'success');
+            } catch (err) {
+                console.error('saveProductFromEditor error:', err);
+                window.showToast('❌ خطأ في الحفظ: ' + (err.message || err), 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> حفظ ونشر'; if (typeof lucide !== 'undefined') lucide.createIcons(); }
+            }
         };
 
         window.deleteAdminProduct = async function(prodId) {

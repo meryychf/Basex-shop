@@ -1311,7 +1311,7 @@
             window.state.products = window.state.products.filter(p => p.id !== prodId);
             saveLocalMirror();
             if (firebaseReady && db) {
-                await db.doc(`artifacts/${appId}/public/data/products/${prodId}`.delete());
+                await db.doc(`artifacts/${appId}/public/data/products/${prodId}`).delete();
             }
             window.refreshUI();
         };
@@ -1393,7 +1393,7 @@
             window.state.vouchers = window.state.vouchers.filter(v => v.code !== code);
             saveLocalMirror();
             if (firebaseReady && db) {
-                await db.doc(`artifacts/${appId}/public/data/vouchers/${code}`.delete());
+                await db.doc(`artifacts/${appId}/public/data/vouchers/${code}`).delete();
             }
             window.refreshUI();
         };
@@ -1515,14 +1515,12 @@
                 try { await auth.signInAnonymously(); } catch (e) {}
             }
             window.closeModal('modal-auth');
-            window.refreshUI();
-            window.showToast(window.t('toast_logout'), 'success');
+            if (typeof window.refreshUI === 'function') window.refreshUI();
+            if (typeof window.showToast === 'function') window.showToast(typeof window.t === 'function' ? window.t('toast_logout') : 'تم الخروج', 'success');
         };
 
-    </script>
 
-    <!-- ==================== UI, ROUTING & INTERACTION CONTROLLER ==================== -->
-    <script>
+        // ==================== UI, ROUTING & INTERACTION CONTROLLER ====================
         const TRANSLATIONS = {
             ar: {
                 brand_subtitle: 'متجر بيسكس للأدوات الرقمية والكورسات',
@@ -2824,15 +2822,15 @@
         window.openModal = function(id) {
             const el = document.getElementById(id);
             if (!el) return;
+            el.style.display = 'flex';
             el.classList.remove('hidden');
-            el.classList.add('flex');
         };
 
         window.closeModal = function(id) {
             const el = document.getElementById(id);
             if (!el) return;
+            el.style.display = 'none';
             el.classList.add('hidden');
-            el.classList.remove('flex');
         };
 
         window.copyText = function(text) {

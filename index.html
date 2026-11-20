@@ -1455,83 +1455,105 @@
         window.handleEmailAuth = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('auth-submit-btn');
-            const email = document.getElementById('auth-email').value.trim().toLowerCase();
-            const password = document.getElementById('auth-password').value;
-            const nameInput = document.getElementById('auth-name') ? document.getElementById('auth-name').value.trim() : '';
+            const email = (document.getElementById('auth-email').value || '').trim().toLowerCase();
+            const password = (document.getElementById('auth-password').value || '');
+            const nameInput = document.getElementById('auth-name') ? (document.getElementById('auth-name').value || '').trim() : '';
             const isRegister = window.state.authMode === 'register';
 
             if (!email || !password) return;
             if (password.length < 6) {
-                window.showToast(typeof window.t === 'function' ? window.t('toast_short_pass') : 'كلمة المرور قصيرة جداً (6 أحرف على الأقل)', 'error');
+                window.showToast(window.t('toast_short_pass'), 'error');
                 return;
             }
 
-            // Lock button
-            const origText = btn ? btn.textContent : '';
-            if (btn) { btn.disabled = true; btn.textContent = '...'; }
+            // Lock button — ALWAYS unlock in finally
+            const origHTML = btn ? btn.innerHTML : '';
+            if (btn) { btn.disabled = true; btn.textContent = isRegister ? '...جاري الإنشاء' : '...جاري الدخول'; }
 
-            const done = (success, msg) => {
-                if (btn) { btn.disabled = false; btn.textContent = origText; }
-                if (success) {
-                    window.closeModal('modal-auth');
-                    window.showToast(msg || (typeof window.t === 'function' ? window.t('toast_login_ok') : 'تم تسجيل الدخول ✓'), 'success');
-                    if (typeof window.refreshUI === 'function') window.refreshUI();
-                } else {
-                    window.showToast(msg, 'error');
-                }
+            const unlockBtn = () => {
+                if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+            };
+            const succeed = (msg) => {
+                unlockBtn();
+                window.closeModal('modal-auth');
+                window.showToast(msg, 'success');
+                if (typeof window.refreshUI === 'function') window.refreshUI();
+            };
+            const fail = (msg) => {
+                unlockBtn();
+                window.showToast(msg, 'error');
             };
 
-            // Firebase auth
-            if (firebaseReady && auth) {
-                try {
-                    let cred;
-                    if (isRegister) {
-                        cred = await auth.createUserWithEmailAndPassword(email, password);
-                    } else {
-                        cred = await auth.signInWithEmailAndPassword(email, password);
+            try {
+                // ---- Try Firebase first (with 12s timeout) ----
+                if (firebaseReady && auth) {
+                    try {
+                        const withTimeout = (promise, ms) => Promise.race([
+                            promise,
+                            new Promise((_, reject) => setTimeout(() => reject({ code: 'auth/timeout', message: 'timeout' }), ms))
+                        ]);
+                        let cred;
+                        if (isRegister) {
+                            cred = await withTimeout(auth.createUserWithEmailAndPassword(email, password), 12000);
+                        } else {
+                            cred = await withTimeout(auth.signInWithEmailAndPassword(email, password), 12000);
+                        }
+                        const fbUser = cred.user;
+                        const existing = window.state.usersMap[fbUser.uid];
+                        const userObj = existing || {
+                            uid: fbUser.uid,
+                            email: fbUser.email,
+                            displayName: nameInput || fbUser.email.split('@')[0],
+                            balanceUSD: 0.00,
+                            role: 'user',
+                            createdAt: new Date().toISOString()
+                        };
+                        await window.dbUpsertUser(userObj);
+                        succeed(isRegister ? '🎉 تم إنشاء الحساب بنجاح!' : '✅ مرحباً بعودتك!');
+                        return;
+                    } catch (fbErr) {
+                        const code = fbErr.code || '';
+                        if (code === 'auth/email-already-in-use') { fail('⚠️ هذا الإيميل مسجل مسبقاً، سجّل الدخول بدلاً منه'); return; }
+                        if (code === 'auth/user-not-found' || code === 'auth/invalid-credential' || code === 'auth/wrong-password') { fail('❌ إيميل أو كلمة مرور خاطئة'); return; }
+                        if (code === 'auth/invalid-email') { fail('❌ صيغة الإيميل غير صحيحة'); return; }
+                        if (code === 'auth/too-many-requests') { fail('⏳ محاولات كثيرة، انتظر قليلاً'); return; }
+                        if (code === 'auth/network-request-failed') { fail('❌ خطأ في الاتصال، تحقق من الإنترنت'); return; }
+                        if (code === 'auth/operation-not-allowed') { fail('❌ تسجيل الدخول بالإيميل غير مفعّل، راجع Firebase Console'); return; }
+                        if (code === 'auth/timeout') {
+                            console.warn('Firebase auth timed out, falling back to local mode');
+                            // Fall through to local — don't show error yet, local might work
+                        } else {
+                            // Unknown error → fall through to local silently
+                            console.warn('Firebase auth error (falling to local):', code, fbErr.message);
+                        }
                     }
-                    const fbUser = cred.user;
-                    const existing = window.state.usersMap[fbUser.uid];
-                    const userObj = existing || {
-                        uid: fbUser.uid,
-                        email: fbUser.email,
-                        displayName: nameInput || fbUser.email.split('@')[0],
-                        balanceUSD: 0.00,
-                        role: 'user',
-                        createdAt: new Date().toISOString()
-                    };
-                    await window.dbUpsertUser(userObj);
-                    done(true, isRegister ? '🎉 تم إنشاء الحساب بنجاح!' : '✅ مرحباً بعودتك!');
-                    return;
-                } catch (err) {
-                    const code = err.code || '';
-                    if (code === 'auth/email-already-in-use') { done(false, '⚠️ هذا الإيميل مسجل مسبقاً، سجّل الدخول بدلاً منه'); return; }
-                    if (code === 'auth/user-not-found' || code === 'auth/invalid-credential' || code === 'auth/wrong-password') { done(false, '❌ إيميل أو كلمة مرور خاطئة'); return; }
-                    if (code === 'auth/invalid-email') { done(false, '❌ صيغة الإيميل غير صحيحة'); return; }
-                    if (code === 'auth/too-many-requests') { done(false, '⏳ محاولات كثيرة، انتظر قليلاً'); return; }
-                    // Fall through to local mode
-                    console.warn('Firebase auth failed, using local mode:', err.code);
                 }
-            }
 
-            // Local fallback
-            const uid = 'usr_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
-            const existing = window.state.usersMap[uid];
-            if (isRegister) {
-                if (existing) { done(false, '⚠️ هذا الإيميل مسجل مسبقاً'); return; }
-                await window.dbUpsertUser({
-                    uid, email,
-                    passwordHash: btoa(password),
-                    displayName: nameInput || email.split('@')[0],
-                    balanceUSD: 0.00, role: 'user',
-                    createdAt: new Date().toISOString()
-                });
-            } else {
-                if (!existing) { done(false, '❌ الحساب غير موجود، سجّل أولاً'); return; }
-                if (existing.passwordHash && existing.passwordHash !== btoa(password)) { done(false, '❌ كلمة المرور خاطئة'); return; }
-                await window.dbUpsertUser(existing);
+                // ---- Local fallback (offline / Firebase not ready) ----
+                const safeB64 = (s) => { try { return btoa(unescape(encodeURIComponent(s))); } catch(x) { return btoa(s.replace(/[^\x00-\x7F]/g,'')); } };
+                const uid = 'usr_' + safeB64(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
+                const existing = window.state.usersMap[uid];
+                if (isRegister) {
+                    if (existing) { fail('⚠️ هذا الإيميل مسجل مسبقاً، سجّل الدخول'); return; }
+                    await window.dbUpsertUser({
+                        uid, email,
+                        passwordHash: safeB64(password),
+                        displayName: nameInput || email.split('@')[0],
+                        balanceUSD: 0.00, role: 'user',
+                        createdAt: new Date().toISOString()
+                    });
+                    succeed('🎉 تم إنشاء الحساب! (وضع محلي — قيد الاتصال بالخادم)');
+                } else {
+                    if (!existing) { fail('❌ الحساب غير موجود، أنشئ حساباً أولاً'); return; }
+                    if (existing.passwordHash && existing.passwordHash !== safeB64(password)) { fail('❌ كلمة المرور خاطئة'); return; }
+                    await window.dbUpsertUser(existing);
+                    succeed('✅ مرحباً! (وضع محلي)');
+                }
+            } catch (unexpectedErr) {
+                // Catch-all: ALWAYS unlock the button, never freeze
+                console.error('handleEmailAuth unexpected error:', unexpectedErr);
+                fail('❌ حدث خطأ غير متوقع، حاول مرة أخرى');
             }
-            done(true, isRegister ? '🎉 تم إنشاء الحساب!' : '✅ مرحباً!');
         };
 
         window.handleGoogleSignIn = async function() {
@@ -1570,7 +1592,6 @@
             window.closeModal('modal-auth');
             window.showToast(window.t('toast_logout'), 'success');
             if (typeof window.refreshUI === 'function') window.refreshUI();
-            if (typeof window.showToast === 'function') window.showToast(typeof window.t === 'function' ? window.t('toast_logout') : 'تم الخروج', 'success');
         };
 
 
@@ -2292,13 +2313,30 @@
             if (_purchaseInProgress) return;
             _purchaseInProgress = true;
 
-            // Lock the buy button visually
-            const buyBtn = document.querySelector('#product-modal-body button[onclick*="executePurchase"]');
-            if (buyBtn) { buyBtn.disabled = true; buyBtn.textContent = '...جاري المعالجة'; }
+            // Track the button by id so we can find it in finally even if DOM changed
+            const buyBtnId = '__buy_btn_active__';
+            let buyBtn = document.querySelector('#product-modal-body button[onclick*="executePurchase"]');
+            if (buyBtn) {
+                buyBtn.id = buyBtnId;
+                buyBtn.disabled = true;
+                buyBtn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px"><svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>...جاري المعالجة</span>';
+            }
+
+            const unlockBuyBtn = () => {
+                _purchaseInProgress = false;
+                const b = document.getElementById(buyBtnId) || document.querySelector('#product-modal-body button[onclick*="executePurchase"]');
+                if (b) {
+                    b.disabled = false;
+                    b.id = '';
+                    b.innerHTML = '<i data-lucide="zap" class="w-4 h-4"></i> <span>' + window.t('btn_buy_now') + '</span>';
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            };
 
             try {
             const user = window.state.currentUser;
             if (!user) {
+                unlockBuyBtn();
                 closeModal('modal-product');
                 window.showToast(window.t('toast_need_login'), 'error');
                 openAuthModal();
@@ -2306,7 +2344,7 @@
             }
 
             const p = window.state.products.find(x => x.id === prodId);
-            if (!p || Number(p.stock) <= 0) return;
+            if (!p || Number(p.stock) <= 0) { unlockBuyBtn(); return; }
 
             let finalPrice = Number(p.priceUSD);
             if (window.state.appliedDiscount) {
@@ -2347,9 +2385,8 @@
             } catch(err) {
                 console.error('executePurchase error:', err);
                 window.showToast('❌ حدث خطأ أثناء الشراء، حاول مجدداً', 'error');
-                if (buyBtn) { buyBtn.disabled = false; buyBtn.innerHTML = '<i data-lucide="zap" class="w-4 h-4"></i> ' + window.t('btn_buy_now'); lucide.createIcons(); }
             } finally {
-                _purchaseInProgress = false;
+                unlockBuyBtn();
             }
         };
 
